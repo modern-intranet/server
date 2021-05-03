@@ -1,0 +1,86 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-image: radial-gradient(#c6c9ff 1px, transparent 1px),
+    radial-gradient(#c6c9ff 1px, #f3f3f3 1px);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+a {
+  color: #333 !important;
+}
+
+nav {
+  background-color: #f8f8f8;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* index page */
+.dropdown-menu.open {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.dropdown-menu.inner {
+  max-height: 200px;
+}
+
+.message {
+  text-align: center;
+}
+
+form {
+  margin-top: 96px;
+}
+
+.bootstrap-select {
+  min-width: 300px;
+}
+
+#outside-hour-warning {
+  text-align: center;
+  color: maroon;
+}
+
+/* list page */
+table {
+  margin: 72px 16px 0 16px;
+  border: 1px solid #dbdbdb;
+}
+
+.dropdown-item.selected,
+.dropdown-item.active {
+  color: white !important;
+}
+
+.list-table tr:nth-child(odd) {
+  background-color: #f8f8f8;
+}
+
+.list-table tr:hover {
+  background-color: aliceblue;
+}
+
+.list-table th {
+  display: none;
+}
+
+.list-table td:nth-child(2) {
+  display: none;
+}
+
+.list-table td:not(:nth-child(1)) {
+  text-align: left;
+}
+
+#datepicker {
+  width: min-content;
+  margin-left: 16px;
+  margin-top: -24px;
+}

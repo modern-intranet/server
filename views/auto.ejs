@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Intranet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="icon" href="images/icon.png" type="image/x-icon">
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css ">
+</head>
+
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Mở thanh điều hướng</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Modern Intranet</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Đặt cơm</a></li>
+          <li><a href="/list">Danh sách đã đặt</a></li>
+          <li class="active"><a href="/auto">Đặt cơm tự động</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Thông tin <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="/guide">Hướng dẫn</a></li>
+              <li><a href="/github">Github</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="center">
+    <form action="/auto" method="POST" onSubmit="onSubmit(this)">
+
+      <!-- user select -->
+      <label for="user">Tên:</label>
+      <br />
+      <select id="user" name="user" class="selectpicker" data-live-search="true">
+        <% users.forEach(user => { %>
+        <% if (user.userId == session.userId) { %>
+        <option value="<%= user.userId %>" selected>
+          <%= user.userText %>
+          <% if (autoList.some(auto => auto.userId == user.userId)) { %> (✓) <% } %>
+        </option>
+        <% } else { %>
+        <option value="<%= user.userId %>">
+          <%= user.userText %>
+          <% if (autoList.some(auto => auto.userId == user.userId)) { %> (✓) <% } %>
+        </option>
+        <% } %>
+        <% }) %>
+      </select>
+      <br /><br />
+
+      <!-- user preference select -->
+      <label for="preference">Danh sách ưu tiên:</label>
+      <br />
+      <input id="preference" class="form-control" name="preference" placeholder="cá, thịt, đậu hũ, sườn non" />
+      <br />
+
+      <!-- button submit -->
+      <div class="center">
+        <button id="submit-button" type="submit" class="btn btn-primary">Đặt lịch</button>
+      </div>
+
+      <!-- error or success message -->
+      <% if (message) { %>
+      <br />
+      <div class="message">
+        <strong>
+          <%- message %>
+        </strong>
+      </div>
+      <% }%>
+    </form>
+  </div>
+
+  <script>
+    let users = JSON.parse('<%- JSON.stringify(users) %>');
+    let autoList = JSON.parse('<%- JSON.stringify(autoList) %>');
+    let session = JSON.parse('<%- JSON.stringify(session) %>');
+
+    let autoListMap = {};
+    autoList.forEach(auto => {
+      autoListMap[auto.userId] = auto;
+    });
+
+    function onSubmit() {
+      const submitButton = document.querySelector('#submit-button');
+      submitButton.disabled = true;
+    }
+
+    function updateSelected(userId) {
+      const auto = autoListMap[userId];
+      $('#preference').val(auto ? auto.preference.join(', ') : '').trigger('change');
+    }
+
+    // handle on select user
+    window.onload = () => {
+      const userSelect = document.querySelector('#user');
+      userSelect.addEventListener('change', e => updateSelected(e.target.value));
+      updateSelected(session.userId || userSelect.value);
+    }
+  </script>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js "></script>
+</body>
+
+</html>
