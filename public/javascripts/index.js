@@ -1,9 +1,3 @@
-// disable button while submitting
-function onSubmit() {
-  $("#submit-button").prop("disabled", true);
-}
-
-// handle on select user
 window.onload = () => {
   // save user and dish choices
   $("#user").change((e) => {
@@ -31,3 +25,8 @@ window.onload = () => {
   (today.toISOString().split("T")[0] >= date.id || hours < 13 || hours > 17) &&
     $("#outside-hour-warning").show();
 };
+
+// disable button while submitting
+function onSubmit() {
+  $("#submit-button").prop("disabled", true);
+}

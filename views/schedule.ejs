@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Intranet</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <link rel="icon" href="images/icon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+
+    <!-- jQuery -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+    />
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap select -->
+    <link
+      rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css"
+    />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button
+            type="button"
+            class="navbar-toggle"
+            data-toggle="collapse"
+            data-target="#bs-example-navbar-collapse-1"
+          >
+            <span class="sr-only">Mở thanh điều hướng</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Modern Intranet</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Đặt cơm</a></li>
+            <li><a href="/list">Danh sách đã đặt</a></li>
+            <li class="active"><a href="/schedule">Đặt cơm tự động</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                >Thông tin <span class="caret"></span
+              ></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="/guide">Hướng dẫn</a></li>
+                <li><a href="/github">Github</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="center">
+      <form
+        id="form"
+        action="/schedule"
+        method="POST"
+        onSubmit="onSubmit(this)"
+      >
+        <div id="two-columns">
+          <div>
+            <!-- user select -->
+            <label for="user">Tên:</label>
+            <br />
+            <select
+              id="user"
+              name="user"
+              class="selectpicker"
+              data-live-search="true"
+            >
+              <% users.forEach(user => { %>
+              <option value="<%= user.id %>"><%= user.name %></option>
+              <% }) %>
+            </select>
+            <br />
+            <br />
+
+            <!-- this week menu select -->
+            <h4>Tuần này</h4>
+            <% thisWeekMenu.forEach((data, i) => { %>
+            <span
+              >Thứ <%- i + 2 %>, <%- data.date.split('-').reverse().join('-')
+              %>:</span
+            >
+            <br />
+            <select
+              id="<%= data.date %>"
+              name="<%= data.date %>"
+              class="selectpicker"
+              data-live-search="true"
+            >
+              <option value="">-</option>
+              <option value="Random">Ngẫu nhiên</option>
+              <% data.menus.forEach(menu => { %>
+              <option value="<%= menu.dish %>"><%= menu.dish %></option>
+              <% }) %>
+            </select>
+            <br />
+            <br />
+            <% }) %>
+          </div>
+          <div>
+            <!-- submit button -->
+            <button
+              id="submit-button"
+              type="submit"
+              class="btn btn-primary"
+              style="margin-top: 24px"
+            >
+              Đặt lịch
+            </button>
+            <br />
+            <br />
+
+            <!-- next week menu select -->
+            <h4>Tuần sau</h4>
+            <% nextWeekMenu.forEach((data, i) => { %>
+            <span
+              >Thứ <%- i + 2 %>, <%- data.date.split('-').reverse().join('-')
+              %>:</span
+            >
+            <br />
+            <select
+              id="<%= data.date %>"
+              name="<%= data.date %>"
+              class="selectpicker"
+              data-live-search="true"
+            >
+              <option value="">-</option>
+              <option value="Random">Ngẫu nhiên</option>
+              <% data.menus.forEach(menu => { %>
+              <option value="<%= menu.dish %>"><%= menu.dish %></option>
+              <% }) %>
+            </select>
+            <br />
+            <br />
+            <% }) %>
+          </div>
+        </div>
+      </form>
+    </div>
+    <br />
+
+    <!-- Parse variables -->
+    <script>
+      var users = JSON.parse(`<%- JSON.stringify(users) %>`);
+      var thisWeekMenu = JSON.parse(`<%- JSON.stringify(thisWeekMenu) %>`);
+      var nextWeekMenu = JSON.parse(`<%- JSON.stringify(nextWeekMenu) %>`);
+    </script>
+
+    <!-- Other logic -->
+    <script src="/javascripts/schedule.js" type="text/javascript"></script>
+  </body>
+</html>

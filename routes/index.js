@@ -19,16 +19,19 @@ const getOrderResultMessage = (code) => {
 };
 
 router.get("/", async (req, res) => {
-  const { session } = req;
+  // get recent message
+  const message = getOrderResultMessage(req.session.orderCode);
+  req.session.orderCode = undefined;
+
   const date = await datesModel.getNext();
 
   // no menu yet
   if (!date) {
     res.render("index", {
-      date: date,
+      date,
       users: [],
       menus: [],
-      session: session,
+      message,
     });
 
     // try to get menu
@@ -37,20 +40,15 @@ router.get("/", async (req, res) => {
   // have menu
   else {
     res.render("index", {
-      date: date,
+      date,
       users: await usersModel.getAll(),
       menus: await menusModel.getByDate(date.id),
-      session: session,
+      message,
     });
   }
-
-  // reset session
-  delete session.orderMessage;
 });
 
 router.post("/", async (req, res, next) => {
-  const { session } = req;
-
   // set food through intranet api
   const { statusCode } = await socket.setFood({
     date: req.body.date,
@@ -58,7 +56,7 @@ router.post("/", async (req, res, next) => {
     user_id: req.body.user,
   });
 
-  session.orderMessage = getOrderResultMessage(statusCode);
+  req.session.orderCode = statusCode;
   res.redirect("/");
 });
 

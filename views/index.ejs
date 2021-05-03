@@ -49,7 +49,7 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="/">Đặt cơm</a></li>
             <li><a href="/list">Danh sách đã đặt</a></li>
-            <li><a href="/auto">Đặt cơm tự động</a></li>
+            <li><a href="/schedule">Đặt cơm tự động</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
@@ -92,15 +92,9 @@
           class="selectpicker"
           data-live-search="true"
         >
-          <% users.forEach(user => { %> <% if (user.id == session.userId) { %>
-          <option value="<%= user.id %>" selected>
-            <%= user.name %> <% if (user.dish) { %> (✓) <% } %>
-          </option>
-          <% } else { %>
-          <option value="<%= user.id %>">
-            <%= user.name %> <% if (user.dish) { %> (✓) <% } %>
-          </option>
-          <% } %> <% }) %>
+          <% users.forEach(user => { %>
+          <option value="<%= user.id %>"><%= user.name %></option>
+          <% }) %>
         </select>
         <br /><br />
 
@@ -113,11 +107,9 @@
           class="selectpicker"
           data-live-search="true"
         >
-          <% menus.forEach(menu => { %> <% if (menu.id == session.dishId) { %>
-          <option value="<%= menu.id %>" selected><%= menu.dish %></option>
-          <% } else { %>
+          <% menus.forEach(menu => { %>
           <option value="<%= menu.id %>"><%= menu.dish %></option>
-          <% } %> <% }) %>
+          <% }) %>
         </select>
         <br /><br />
 
@@ -137,10 +129,10 @@
         </div>
 
         <!-- error or success message -->
-        <% if (session.orderMessage) { %>
+        <% if (message) { %>
         <br />
         <div class="message">
-          <strong> <%- session.orderMessage %> </strong>
+          <strong> <%- message %> </strong>
         </div>
         <% }%>
         <br />
@@ -157,7 +149,6 @@
       var users = JSON.parse(`<%- JSON.stringify(users) %>`);
       var date = JSON.parse(`<%- JSON.stringify(date) %>`);
       var menus = JSON.parse(`<%- JSON.stringify(menus) %>`);
-      var session = JSON.parse(`<%- JSON.stringify(session) %>`);
     </script>
 
     <!-- Other logic -->

@@ -1,4 +1,4 @@
-function promiseTimeout(promise, ms = 3000) {
+function promiseTimeout(promise, ms = 5000) {
   const timeout = new Promise((resolve) => {
     const id = setTimeout(() => {
       clearTimeout(id);

@@ -8,6 +8,7 @@ function setupSocket(io) {
   io.on("connect", async (sk) => {
     // intranet connection
     sk.on(ACTIONS.I_AM_INTRANET, async () => {
+      io.socketsLeave(ACTIONS.I_AM_INTRANET);
       sk.join(ACTIONS.I_AM_INTRANET);
       socket = sk;
 
@@ -18,6 +19,10 @@ function setupSocket(io) {
 
       await validateCookie();
     });
+
+    sk.on("diconnect", () => {
+      socket = null;
+    });
   });
 }
 
@@ -25,8 +30,12 @@ async function validateCookie() {
   if (!socket || !socket.connected) return false;
   return timeoutPromise(
     new Promise((resolve) => {
+      let answered = false;
       socket.emit(ACTIONS.VALIDATE_COOKIE, null, (answer) => {
-        resolve(answer);
+        if (!answered) {
+          answered = true;
+          resolve(answer);
+        }
       });
     })
   );
@@ -36,8 +45,12 @@ async function getData(payload) {
   if (!socket || !socket.connected) return false;
   return timeoutPromise(
     new Promise((resolve) => {
+      let answered = false;
       socket.emit(ACTIONS.GET_DATA, payload, (answer) => {
-        resolve(answer);
+        if (!answered) {
+          answered = true;
+          resolve(answer);
+        }
       });
     })
   );
@@ -47,8 +60,12 @@ async function setFood(payload) {
   if (!socket || !socket.connected) return false;
   return timeoutPromise(
     new Promise((resolve) => {
+      let answered = false;
       socket.emit(ACTIONS.SET_FOOD, payload, (answer) => {
-        resolve(answer);
+        if (!answered) {
+          answered = true;
+          resolve(answer);
+        }
       });
     })
   );
@@ -58,8 +75,12 @@ async function getList(payload) {
   if (!socket || !socket.connected) return false;
   return timeoutPromise(
     new Promise((resolve) => {
+      let answered = false;
       socket.emit(ACTIONS.GET_LIST, payload, (answer) => {
-        resolve(answer);
+        if (!answered) {
+          answered = true;
+          resolve(answer);
+        }
       });
     })
   );
@@ -69,8 +90,12 @@ async function getListAll() {
   if (!socket || !socket.connected) return false;
   return timeoutPromise(
     new Promise((resolve) => {
+      let answered = false;
       socket.emit(ACTIONS.GET_LIST_ALL, null, (answer) => {
-        resolve(answer);
+        if (!answered) {
+          answered = true;
+          resolve(answer);
+        }
       });
     })
   );

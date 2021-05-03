@@ -6,6 +6,7 @@ const session = require("express-session");
 
 const indexRouter = require("./routes/index");
 const listRouter = require("./routes/list");
+const sheduleRouter = require("./routes/schedule");
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use(
 
 app.use("/", indexRouter);
 app.use("/list", listRouter);
+app.use("/schedule", sheduleRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

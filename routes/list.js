@@ -13,18 +13,15 @@ router.get("/:date", async (req, res, next) => {
 });
 
 router.get("/", async (req, res, next) => {
-  const { session } = req;
-  const { date } = session;
+  const date = req.session.date;
 
   res.render("list", {
     date: date ? date : (await datesModel.getLast()).id,
-    session: session,
   });
 });
 
 router.post("/", async (req, res, next) => {
-  const { session } = req;
-  session.date = req.body.date;
+  req.session.date = req.body.date;
 
   res.redirect("/list");
 });

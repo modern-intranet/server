@@ -25,6 +25,7 @@ nav {
 .dropdown-menu.open {
   left: 50%;
   transform: translateX(-50%);
+  z-index: 10000;
 }
 
 .dropdown-menu.inner {
@@ -36,7 +37,7 @@ nav {
 }
 
 form {
-  margin-top: 96px;
+  margin-top: 72px;
 }
 
 .bootstrap-select {
@@ -50,7 +51,7 @@ form {
 
 /* list page */
 table {
-  margin: 72px 16px 0 16px;
+  margin-top: 72px;
   border: 1px solid #dbdbdb;
 }
 
@@ -82,5 +83,15 @@ table {
 #datepicker {
   width: min-content;
   margin-left: 16px;
-  margin-top: -24px;
+}
+
+/* schedule page */
+#two-columns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#two-columns > div {
+  margin: 0 16px;
 }
