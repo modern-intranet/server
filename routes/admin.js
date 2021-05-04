@@ -35,7 +35,7 @@ router.post("/upload-menu", async (req, res, next) => {
       const sheet = workbook.Sheets[sheetName];
 
       // check valid monday cell (B3 and must at YYYY-MM-DD format)
-      const mondayDateStr = sheet["B3"]?.v;
+      const mondayDateStr = sheet["B3"] ? sheet["B3"].v : "";
       const isValidDate = /^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/.test(
         mondayDateStr
       );
@@ -51,7 +51,8 @@ router.post("/upload-menu", async (req, res, next) => {
 
         for (let j = 0; j < 30; j++) {
           // first option starts form row 4
-          const dish = sheet[`${columns[i]}${4 + j}`]?.v.trim();
+          const cell = sheet[`${columns[i]}${4 + j}`];
+          const dish = cell ? cell.v.trim() : null;
           if (!dish) break;
 
           record.options.push(dish);
