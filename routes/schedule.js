@@ -5,6 +5,7 @@ const dayjs = require("dayjs");
 const usersModel = require("../models/users");
 const ordersModel = require("../models/orders");
 const menusModel = require("../models/menus");
+const { getListAndSyncOrders } = require("../utils/crawl");
 
 const getScheduleResultMessage = (code) => {
   switch (code) {
@@ -30,8 +31,56 @@ function getNextWeekDates() {
   return result;
 }
 
-// use for ajax call from fe
-router.get("/:userId", async (req, res, next) => {
+router.get("/", async (req, res, next) => {
+  // get recent message
+  const message = getScheduleResultMessage(req.session.scheduleCode);
+  req.session.scheduleCode = undefined;
+
+  // get all menus of this week and next week then fullfil
+  const menus = await menusModel.getByThisAndNextWeek();
+  const thisWeekMenu = getThisWeekDates().map((date) => ({
+    date,
+    menus: menus.filter((m) => m.date === date),
+  }));
+  const nextWeekMenu = getNextWeekDates().map((date) => ({
+    date,
+    menus: menus.filter((m) => m.date === date),
+  }));
+
+  res.render("schedule", {
+    users: await usersModel.getAll(),
+    thisWeekMenu,
+    nextWeekMenu,
+    message,
+  });
+});
+
+// set schedule button action
+router.post("/", async (req, res, next) => {
+  try {
+    for (let date in req.body) {
+      if (date === "user") continue;
+
+      if (!req.body[date]) {
+        await ordersModel.delete({ date, user: req.body.user });
+      } else {
+        await ordersModel.addOrUpdate({
+          date,
+          user: req.body.user,
+          dish: req.body[date],
+        });
+      }
+    }
+    req.session.scheduleCode = 200;
+  } catch {
+    req.session.scheduleCode = -1;
+  }
+
+  res.redirect("/schedule");
+});
+
+// get order schedule of a user
+router.post("/of/:userId", async (req, res, next) => {
   const userId = req.params.userId;
 
   // get all orders of this week and next week then fullfil
@@ -58,51 +107,10 @@ router.get("/:userId", async (req, res, next) => {
   });
 });
 
-router.get("/", async (req, res, next) => {
-  // get recent message
-  const message = getScheduleResultMessage(req.session.scheduleCode);
-  req.session.scheduleCode = undefined;
-
-  // get all menus of this week and next week then fullfil
-  const menus = await menusModel.getByThisAndNextWeek();
-  const thisWeekMenu = getThisWeekDates().map((date) => ({
-    date,
-    menus: menus.filter((m) => m.date === date),
-  }));
-  const nextWeekMenu = getNextWeekDates().map((date) => ({
-    date,
-    menus: menus.filter((m) => m.date === date),
-  }));
-
-  res.render("schedule", {
-    users: await usersModel.getAll(),
-    thisWeekMenu,
-    nextWeekMenu,
-    message,
-  });
-});
-
-router.post("/", async (req, res, next) => {
-  try {
-    for (let date in req.body) {
-      if (date === "user") continue;
-
-      if (!req.body[date]) {
-        await ordersModel.delete({ date, user: req.body.user });
-      } else {
-        await ordersModel.addOrUpdate({
-          date,
-          user: req.body.user,
-          dish: req.body[date],
-        });
-      }
-    }
-    req.session.scheduleCode = 200;
-  } catch {
-    req.session.scheduleCode = -1;
-  }
-
-  res.redirect("/schedule");
+// sync order list from intranet to database
+router.post("/sync/:date", async (req, res, next) => {
+  const date = req.params.date;
+  res.send(await getListAndSyncOrders(date));
 });
 
 module.exports = router;

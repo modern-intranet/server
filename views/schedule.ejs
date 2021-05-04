@@ -76,7 +76,7 @@
         <div id="two-columns">
           <div>
             <!-- user select -->
-            <label for="user">Tên:</label>
+            Tên
             <br />
             <select
               id="user"
@@ -92,12 +92,16 @@
             <br />
 
             <!-- this week menu select -->
-            <h4>Tuần này</h4>
+            <h5><b>Tuần này</b></h5>
             <% thisWeekMenu.forEach((data, i) => { %>
             <span
               >Thứ <%- i + 2 %>, <%- data.date.split('-').reverse().join('-')
-              %>:</span
+              %></span
             >
+            <span
+              onClick="syncOrderOfDate('<%- data.date %>')"
+              class="glyphicon glyphicon-repeat refresh-icon"
+            ></span>
             <br />
             <select
               id="<%= data.date %>"
@@ -115,29 +119,36 @@
             <br />
             <% }) %>
           </div>
+
           <div>
             <!-- submit button -->
             <button
               id="submit-button"
               type="submit"
               class="btn btn-primary"
-              style="margin-top: 24px"
+              style="margin-top: 20px"
             >
               Đặt lịch
             </button>
-            &nbsp;<span style="position: absolute; transform: translateY(30px)"
+            &nbsp;<span
+              id="schedule-message"
+              style="position: absolute; transform: translateY(25px)"
               ><b><%- message -%></b></span
             >
             <br />
             <br />
 
             <!-- next week menu select -->
-            <h4>Tuần sau</h4>
+            <h5><b>Tuần sau</b></h5>
             <% nextWeekMenu.forEach((data, i) => { %>
             <span
               >Thứ <%- i + 2 %>, <%- data.date.split('-').reverse().join('-')
-              %>:</span
+              %></span
             >
+            <span
+              onClick="syncOrderOfDate('<%- data.date %>')"
+              class="glyphicon glyphicon-repeat refresh-icon"
+            ></span>
             <br />
             <select
               id="<%= data.date %>"

@@ -3,8 +3,8 @@ window.onload = () => {
   $("#user").change((e) => {
     localStorage.setItem("userId", e.target.value);
 
-    // auto select food
-    $.get(`/menu/${e.target.value}/${date.id}`, (data) => {
+    // auto select food by getting data
+    $.post(`/menu/${e.target.value}/${date.id}`, (data) => {
       const menu = menus.find((menu) => menu.dish === data);
       if (menu) $("#dish").val(menu.id).change();
     });
@@ -17,6 +17,9 @@ window.onload = () => {
     const menu = menus.find((menu) => menu.id === +e.target.value);
     menu && $("#dishName").val(menu.dish);
   });
+
+  // trigger first time to update dishName field
+  $("#dish").change();
 
   // auto restore select user and dish
   const userOption = localStorage.getItem("userId");

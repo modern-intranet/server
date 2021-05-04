@@ -19,14 +19,6 @@ const getOrderResultMessage = (code) => {
   }
 };
 
-// use for ajax call from fe
-router.get("/menu/:userId/:date", async (req, res) => {
-  const userId = +req.params.userId;
-  const date = req.params.date;
-  const order = await ordersModel.getByUserAndDate(userId, date);
-  res.send(order && order.dish);
-});
-
 router.get("/", async (req, res) => {
   // get recent message
   const message = getOrderResultMessage(req.session.orderCode);
@@ -51,7 +43,7 @@ router.get("/", async (req, res) => {
     res.render("index", {
       date,
       users: await usersModel.getAll(),
-      menus: await menusModel.getByDate(date.id),
+      menus: (await menusModel.getByDate(date.id)).filter((x) => !!x.id),
       message,
     });
   }
@@ -77,6 +69,14 @@ router.post("/", async (req, res, next) => {
       status: 1,
     });
   }
+});
+
+// get order dish of a user on a date
+router.post("/menu/:userId/:date", async (req, res) => {
+  const userId = +req.params.userId;
+  const date = req.params.date;
+  const order = await ordersModel.getByUserAndDate(userId, date);
+  res.send(order && order.dish);
 });
 
 module.exports = router;

@@ -13,7 +13,7 @@ window.onload = () => {
   });
 
   // use ajax to get table list
-  $.get(`/list/${date}`, (data) => {
+  $.post(`/list/of/${date}`, (data) => {
     try {
       if (data.data.table.includes("<td>")) {
         $("#list-table").html(data.data.table);

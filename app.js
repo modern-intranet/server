@@ -7,18 +7,9 @@ const session = require("express-session");
 const indexRouter = require("./routes/index");
 const listRouter = require("./routes/list");
 const sheduleRouter = require("./routes/schedule");
+const adminRouter = require("./routes/admin");
 
 const app = express();
-
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
 
 // load env file
 require("dotenv").config();
@@ -52,6 +43,7 @@ app.use(
 app.use("/", indexRouter);
 app.use("/list", listRouter);
 app.use("/schedule", sheduleRouter);
+app.use("/admin", adminRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

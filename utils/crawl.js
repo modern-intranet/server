@@ -67,26 +67,31 @@ async function getDataAndSave(forceUpdate = true) {
  *  Sync intranet order list to database
  */
 async function getListAndSyncOrders(date) {
-  const response = await socket.getList(date);
-  if (!response || response.statusCode !== 200) return;
+  try {
+    const response = await socket.getList({ date });
+    if (!response || response.statusCode !== 200) return;
 
-  const data = [];
+    // use normal for loop for await async to work as expected
+    for (let i = 0; i < response.data.list.length; i++) {
+      const record = response.data.list[i];
+      const user = await usersModel.getByUsername(record.username);
 
-  // use normal for loop for await async to work as expected
-  for (let i = 0; i < response.data.list.length; i++) {
-    const record = response.data.list[i];
-    const user = await usersModel.getByUsername(record.username);
-
-    // save order to database
-    user &&
-      (await ordersModel.addOrUpdate({
-        user: user.id,
-        date: record.date,
-        dish: record.dish,
-        status: 1,
-      }));
+      // save order to database
+      user &&
+        (await ordersModel.addOrUpdate({
+          user: user.id,
+          date: record.date,
+          dish: record.dish,
+          status: 1,
+        }));
+    }
+    return true;
+  } catch {
+    return false;
   }
 }
+
+setTimeout(() => getDataAndSave(), 4000);
 
 module.exports = {
   getDataAndSave,
