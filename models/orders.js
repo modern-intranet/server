@@ -1,6 +1,13 @@
 const db = require("../utils/db");
 
 module.exports = {
+  getByUserAndDate: async (userId, date) => {
+    return (
+      await db.load(
+        `SELECT * FROM orders WHERE user = ${userId} AND date = '${date}'`
+      )
+    )[0];
+  },
   getByUser: (userId) => {
     return db.load(
       `SELECT * FROM orders WHERE user = ${userId} 
@@ -9,8 +16,11 @@ module.exports = {
   },
   addOrUpdate: (entity) => {
     return db.load(
-      `INSERT INTO orders VALUES ('${entity.user}', '${entity.date}', '${entity.dish}', 0) 
-      ON DUPLICATE KEY UPDATE dish = '${entity.dish}'`
+      `INSERT INTO orders VALUES ('${entity.user}', '${entity.date}', '${
+        entity.dish
+      }', 0) 
+      ON DUPLICATE KEY UPDATE dish = '${entity.dish}' 
+      ${entity.status ? `, status = ${entity.status}` : ""}`
     );
   },
   delete: (entity) => {

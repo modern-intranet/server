@@ -1,5 +1,7 @@
 const datesModel = require("../models/dates");
 const menusModel = require("../models/menus");
+const ordersModel = require("../models/orders");
+const usersModel = require("../models/users");
 const socket = require("../socket");
 
 async function getDataAndSave(forceUpdate = true) {
@@ -61,6 +63,32 @@ async function getDataAndSave(forceUpdate = true) {
   return isSucceed;
 }
 
+/**
+ *  Sync intranet order list to database
+ */
+async function getListAndSyncOrders(date) {
+  const response = await socket.getList(date);
+  if (!response || response.statusCode !== 200) return;
+
+  const data = [];
+
+  // use normal for loop for await async to work as expected
+  for (let i = 0; i < response.data.list.length; i++) {
+    const record = response.data.list[i];
+    const user = await usersModel.getByUsername(record.username);
+
+    // save order to database
+    user &&
+      (await ordersModel.addOrUpdate({
+        user: user.id,
+        date: record.date,
+        dish: record.dish,
+        status: 1,
+      }));
+  }
+}
+
 module.exports = {
   getDataAndSave,
+  getListAndSyncOrders,
 };

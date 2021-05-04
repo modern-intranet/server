@@ -14,10 +14,12 @@ window.onload = () => {
 
   // use ajax to get table list
   $.get(`/list/${date}`, (data) => {
-    if (data && data.data && data.data.includes("<td>")) {
-      $("#list-table").html(data.data);
-    } else {
-      $("#list-table td").html("<b>Không có danh sách</b>");
-    }
+    try {
+      if (data.data.table.includes("<td>")) {
+        $("#list-table").html(data.data.table);
+      } else {
+        $("#list-table td").html("<b>Không có danh sách</b>");
+      }
+    } catch {}
   });
 };

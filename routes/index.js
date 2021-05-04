@@ -4,6 +4,7 @@ const router = express.Router();
 const usersModel = require("../models/users");
 const menusModel = require("../models/menus");
 const datesModel = require("../models/dates");
+const ordersModel = require("../models/orders");
 const socket = require("../socket");
 const { getDataAndSave } = require("../utils/crawl");
 
@@ -17,6 +18,14 @@ const getOrderResultMessage = (code) => {
       return "Hãy thử lại sau nhé ⚠";
   }
 };
+
+// use for ajax call from fe
+router.get("/menu/:userId/:date", async (req, res) => {
+  const userId = +req.params.userId;
+  const date = req.params.date;
+  const order = await ordersModel.getByUserAndDate(userId, date);
+  res.send(order && order.dish);
+});
 
 router.get("/", async (req, res) => {
   // get recent message
@@ -58,6 +67,16 @@ router.post("/", async (req, res, next) => {
 
   req.session.orderCode = statusCode;
   res.redirect("/");
+
+  // save order to database
+  if (statusCode === 200) {
+    ordersModel.addOrUpdate({
+      user: +req.body.user,
+      date: req.body.date,
+      dish: req.body.dishName,
+      status: 1,
+    });
+  }
 });
 
 module.exports = router;

@@ -6,6 +6,17 @@ const usersModel = require("../models/users");
 const ordersModel = require("../models/orders");
 const menusModel = require("../models/menus");
 
+const getScheduleResultMessage = (code) => {
+  switch (code) {
+    case 200:
+      return "Đặt lịch thành công ✓";
+    case 403:
+      return "Không đủ quyền truy cập ⚠";
+    case -1:
+      return "Hãy thử lại sau nhé ⚠";
+  }
+};
+
 function getThisWeekDates() {
   const result = [];
   for (let i = 1; i <= 5; i++) result.push(dayjs().day(i).format("YYYY-MM-DD"));
@@ -48,6 +59,10 @@ router.get("/:userId", async (req, res, next) => {
 });
 
 router.get("/", async (req, res, next) => {
+  // get recent message
+  const message = getScheduleResultMessage(req.session.scheduleCode);
+  req.session.scheduleCode = undefined;
+
   // get all menus of this week and next week then fullfil
   const menus = await menusModel.getByThisAndNextWeek();
   const thisWeekMenu = getThisWeekDates().map((date) => ({
@@ -63,23 +78,30 @@ router.get("/", async (req, res, next) => {
     users: await usersModel.getAll(),
     thisWeekMenu,
     nextWeekMenu,
+    message,
   });
 });
 
 router.post("/", async (req, res, next) => {
-  for (let date in req.body) {
-    if (date === "user") continue;
+  try {
+    for (let date in req.body) {
+      if (date === "user") continue;
 
-    if (!req.body[date]) {
-      await ordersModel.delete({ date, user: req.body.user });
-    } else {
-      await ordersModel.addOrUpdate({
-        date,
-        user: req.body.user,
-        dish: req.body[date],
-      });
+      if (!req.body[date]) {
+        await ordersModel.delete({ date, user: req.body.user });
+      } else {
+        await ordersModel.addOrUpdate({
+          date,
+          user: req.body.user,
+          dish: req.body[date],
+        });
+      }
     }
+    req.session.scheduleCode = 200;
+  } catch {
+    req.session.scheduleCode = -1;
   }
+
   res.redirect("/schedule");
 });
 

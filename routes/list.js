@@ -8,7 +8,6 @@ const socket = require("../socket");
 router.get("/:date", async (req, res, next) => {
   const date = req.params.date;
   const response = await socket.getList({ date });
-
   res.send(response);
 });
 
