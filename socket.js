@@ -20,6 +20,10 @@ function setupSocket(io) {
       await validateCookie();
     });
 
+    sk.on("forceDisconnect", () => {
+      sk.disconnect();
+    });
+
     sk.on("diconnect", () => {
       socket = null;
     });

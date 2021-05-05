@@ -16,10 +16,14 @@ const getOrderResultMessage = (code) => {
       return "Không đủ quyền truy cập ⚠";
     case -1:
       return "Hãy thử lại sau nhé ⚠";
+    default:
+      return "";
   }
 };
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
+  if (!req.session.passport) return res.redirect("/login");
+
   // get recent message
   const message = getOrderResultMessage(req.session.orderCode);
   req.session.orderCode = undefined;
@@ -29,7 +33,7 @@ router.get("/", async (req, res) => {
   // no menu yet
   if (!date) {
     res.render("index", {
-      date,
+      date: "",
       users: [],
       menus: [],
       message,

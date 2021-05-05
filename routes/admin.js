@@ -8,6 +8,7 @@ const menusModel = require("../models/menus");
 const ordersModel = require("../models/orders");
 
 router.get("/tqnghi@", async (req, res, next) => {
+  if (!req.session.passport) return res.redirect("/login");
   res.render("admin");
 });
 

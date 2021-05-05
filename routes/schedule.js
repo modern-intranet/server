@@ -15,6 +15,8 @@ const getScheduleResultMessage = (code) => {
       return "Không đủ quyền truy cập ⚠";
     case -1:
       return "Hãy thử lại sau nhé ⚠";
+    default:
+      return "";
   }
 };
 
@@ -32,6 +34,8 @@ function getNextWeekDates() {
 }
 
 router.get("/", async (req, res, next) => {
+  if (!req.session.passport) return res.redirect("/login");
+
   // get recent message
   const message = getScheduleResultMessage(req.session.scheduleCode);
   req.session.scheduleCode = undefined;

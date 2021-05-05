@@ -3,16 +3,23 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const passport = require("passport");
 
 const indexRouter = require("./routes/index");
 const listRouter = require("./routes/list");
 const sheduleRouter = require("./routes/schedule");
 const adminRouter = require("./routes/admin");
-
-const app = express();
+const loginRouter = require("./routes/login");
 
 // load env file
 require("dotenv").config();
+
+const app = express();
+
+// middlewares
+require("./middlewares/passport.middleware");
+app.use(passport.initialize());
+app.use(passport.session());
 
 // cron jobs
 require("./crons");
@@ -44,6 +51,7 @@ app.use("/", indexRouter);
 app.use("/list", listRouter);
 app.use("/schedule", sheduleRouter);
 app.use("/admin", adminRouter);
+app.use("/login", loginRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

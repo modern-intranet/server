@@ -5,6 +5,8 @@ const datesModel = require("../models/dates");
 const socket = require("../socket");
 
 router.get("/", async (req, res, next) => {
+  if (!req.session.passport) return res.redirect("/login");
+
   const date = req.session.date;
 
   res.render("list", {

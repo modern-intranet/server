@@ -76,6 +76,7 @@
           name="date"
           class="selectpicker"
           data-live-search="true"
+          data-none-selected-text="Danh sách rỗng"
         >
           <% if (date) { %>
           <option value="<%= date.id %>"><%= date.name %></option>
@@ -91,6 +92,7 @@
           name="user"
           class="selectpicker"
           data-live-search="true"
+          data-none-selected-text="Danh sách rỗng"
         >
           <% users.forEach(user => { %>
           <option value="<%= user.id %>"><%= user.name %></option>
@@ -107,6 +109,7 @@
           name="dish"
           class="selectpicker"
           data-live-search="true"
+          data-none-selected-text="Danh sách rỗng"
         >
           <% menus.forEach(menu => { %>
           <option value="<%= menu.id %>"><%= menu.dish %></option>
