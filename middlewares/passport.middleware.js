@@ -31,6 +31,7 @@ passport.use(
             "@foody.com",
             "@sea.com",
             "@garena.com",
+            // "@gmail.com"
           ].some((domain) => email.includes(domain))
         ) {
           return done(null, { email });

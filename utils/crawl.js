@@ -63,9 +63,7 @@ async function getDataAndSave(forceUpdate = true) {
   return isSucceed;
 }
 
-/**
- *  Sync intranet order list to database
- */
+// sync intranet order list to database
 async function getListAndSyncOrders(date) {
   try {
     const response = await socket.getList({ date });

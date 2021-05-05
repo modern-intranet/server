@@ -5,32 +5,25 @@ window.onload = () => {
 
     // auto select food by getting data
     $.post(`/menu/${e.target.value}/${date.id}`, (data) => {
-      const menu = menus.find((menu) => menu.dish === data);
+      const menu = menus.find((menu) => compare(menu.dish, data));
       if (menu) $("#dish").val(menu.id).change();
     });
   });
 
-  $("#dish").change((e) => {
-    localStorage.setItem("dishId", e.target.value);
+  // auto restore selected user
+  const userOption = localStorage.getItem("userId");
+  if (users.some((user) => user.id === +userOption)) {
+    $("#user").val(userOption).change();
+  }
 
-    // save dish name to hidden field (to send along with api)
+  // save dish name to hidden field (to send along with api)
+  $("#dish").change((e) => {
     const menu = menus.find((menu) => menu.id === +e.target.value);
     menu && $("#dishName").val(menu.dish);
   });
 
   // trigger first time to update dishName field
   $("#dish").change();
-
-  // auto restore select user and dish
-  const userOption = localStorage.getItem("userId");
-  if (users.some((user) => user.id == userOption)) {
-    $("#user").val(userOption).change();
-  }
-
-  const dishOption = localStorage.getItem("dishId");
-  if (menus.some((menu) => menu.id == dishOption)) {
-    $("#dish").val(dishOption).change();
-  }
 
   // show warning if outside order hour
   const today = new Date();
@@ -42,4 +35,8 @@ window.onload = () => {
 // disable button while submitting
 function onSubmit() {
   $("#submit-button").prop("disabled", true);
+}
+
+function compare(a, b) {
+  return a.trim().localeCompare(b.trim(), "en", { sensitivity: "base" }) === 0;
 }

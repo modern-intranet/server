@@ -7,9 +7,9 @@ window.onload = () => {
     localStorage.setItem("userId", e.target.value);
   });
 
-  // auto restore select user and dish
+  // auto restore selected user
   const userOption = localStorage.getItem("userId");
-  if (users.some((user) => user.id == userOption)) {
+  if (users.some((user) => user.id === +userOption)) {
     $("#user").val(userOption).change();
   }
 

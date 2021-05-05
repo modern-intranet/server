@@ -4,6 +4,7 @@ const socket = require("./socket");
 const datesModel = require("./models/dates");
 const menusModel = require("./models/menus");
 const ordersModel = require("./models/orders");
+const compare = require("./utils/compare");
 const { getDataAndSave } = require("./utils/crawl");
 
 /**
@@ -51,7 +52,7 @@ async function autoOrder() {
   orders.forEach(async (o) => {
     console.log(`[Cron] User ${o.user} order ${o.dish} ~`);
 
-    let dish = menus.find((m) => m.dish === o.dish);
+    let dish = menus.find((m) => compare(m.dish, o.dish));
 
     // if dish not exist (due to wrong text)
     if (!dish) {

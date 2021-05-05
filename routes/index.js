@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const socket = require("../socket");
 
 const usersModel = require("../models/users");
 const menusModel = require("../models/menus");
 const datesModel = require("../models/dates");
 const ordersModel = require("../models/orders");
-const socket = require("../socket");
 const { getDataAndSave } = require("../utils/crawl");
 
+// message after ordering
 const getOrderResultMessage = (code) => {
   switch (code) {
     case 200:
@@ -21,13 +22,16 @@ const getOrderResultMessage = (code) => {
   }
 };
 
-router.get("/", async (req, res, next) => {
-  if (!req.session.passport) return res.redirect("/login");
+// main route
+router.get("/", async (req, res) => {
+  if (!req.session.user) return res.redirect("/login");
+  const userId = req.session.user.id;
 
-  // get recent message
+  // get message of recent action
   const message = getOrderResultMessage(req.session.orderCode);
   req.session.orderCode = undefined;
 
+  // get target date (if has)
   const date = await datesModel.getNext();
 
   // no menu yet
@@ -44,17 +48,24 @@ router.get("/", async (req, res, next) => {
   }
   // have menu
   else {
+    // filter users
+    let filteredUsers = await usersModel.getAll();
+    if (userId !== 35612) {
+      filteredUsers = filteredUsers.filter((u) => u.id === userId);
+    }
+
     res.render("index", {
       date,
-      users: await usersModel.getAll(),
+      users: filteredUsers,
       menus: (await menusModel.getByDate(date.id)).filter((x) => !!x.id),
       message,
     });
   }
 });
 
-router.post("/", async (req, res, next) => {
-  // set food through intranet api
+// order action
+router.post("/", async (req, res) => {
+  // do it via intranet api
   const { statusCode } = await socket.setFood({
     date: req.body.date,
     food: req.body.dish,
@@ -62,7 +73,6 @@ router.post("/", async (req, res, next) => {
   });
 
   req.session.orderCode = statusCode;
-  res.redirect("/");
 
   // save order to database
   if (statusCode === 200) {
@@ -73,13 +83,17 @@ router.post("/", async (req, res, next) => {
       status: 1,
     });
   }
+
+  res.redirect("/");
 });
 
-// get order dish of a user on a date
+// get ordered dish of a user on a date
 router.post("/menu/:userId/:date", async (req, res) => {
   const userId = +req.params.userId;
   const date = req.params.date;
+
   const order = await ordersModel.getByUserAndDate(userId, date);
+
   res.send(order && order.dish);
 });
 

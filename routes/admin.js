@@ -3,17 +3,19 @@ const router = express.Router();
 const formidable = require("formidable");
 const XLSX = require("xlsx");
 const dayjs = require("dayjs");
+const compare = require("../utils/compare");
 
 const menusModel = require("../models/menus");
 const ordersModel = require("../models/orders");
 
-router.get("/tqnghi@", async (req, res, next) => {
-  if (!req.session.passport) return res.redirect("/login");
+// main route
+router.get("/tqnghi@", async (req, res) => {
+  if (!req.session.user) return res.redirect("/login");
   res.render("admin");
 });
 
 // upload menu from excel
-router.post("/upload-menu", async (req, res, next) => {
+router.post("/upload-menu", async (req, res) => {
   console.log("[Warning] Uploading menu");
 
   try {
@@ -28,8 +30,8 @@ router.post("/upload-menu", async (req, res, next) => {
       const f = files[Object.keys(files)[0]];
       const workbook = XLSX.readFile(f.path);
 
-      const sheetName = workbook.SheetNames.find(
-        (name) => name.trim() === "Menu"
+      const sheetName = workbook.SheetNames.find((name) =>
+        compare(name, "Menu")
       );
       if (!sheetName) return;
 
@@ -80,7 +82,7 @@ router.post("/upload-menu", async (req, res, next) => {
 });
 
 // upload delete menus and orders of last week
-router.post("/purge-data", async (req, res, next) => {
+router.post("/purge-data", async (_, res) => {
   console.log("[Warning] Purging data");
 
   try {
