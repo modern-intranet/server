@@ -8,18 +8,10 @@
     />
     <link rel="icon" href="images/icon.png" type="image/x-icon" />
     <link rel="stylesheet" href="/stylesheets/style.css" />
-
-    <!-- jQuery -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-    <!-- Bootstrap -->
-    <link
-      rel="stylesheet"
-      href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
-    />
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="/javascripts/jquery.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" />
+    <script src="/javascripts/bootstrap.min.js"></script>
   </head>
-
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container-fluid">
@@ -31,13 +23,11 @@
             data-target="#bs-example-navbar-collapse-1"
           >
             <span class="sr-only">Mở thanh điều hướng</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+            <span class="icon-bar"></span> <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="/"><b>Modern Intranet</b></a>
         </div>
-
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <li><a href="/">Đặt cơm</a></li>
@@ -57,19 +47,12 @@
         </div>
       </div>
     </nav>
-
     <div class="center" style="margin-top: 92px">
-      <img
-        style="max-width: 80%"
-        src="https://www.seekpng.com/png/full/212-2123411_404-error-error-404.png"
-      />
+      <img style="max-width: 80%" width="640" src="/images/404.png" />
     </div>
-
-    <!-- Parse variables -->
     <script>
       var message = JSON.parse(`<%- JSON.stringify(message) %>`);
       var error = JSON.parse(`<%- JSON.stringify(error) %>`);
-
       console.log(message);
       console.log(error);
     </script>

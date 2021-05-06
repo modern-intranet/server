@@ -23,12 +23,12 @@ function disableAllElements(disable) {
     $("#user").siblings("button").prop("disabled", true);
     $("#submit-button").prop("disabled", true);
     $(".selectpicker").siblings("button").prop("disabled", true);
-    $(".glyphicon-repeat").hide();
+    $(".refresh-icon").hide();
   } else {
     $("#user").siblings("button").prop("disabled", false);
     $("#submit-button").prop("disabled", false);
     $(".selectpicker").siblings("button").prop("disabled", false);
-    $(".glyphicon-repeat").show();
+    $(".refresh-icon").show();
   }
 }
 
