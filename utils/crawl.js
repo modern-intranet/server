@@ -57,7 +57,7 @@ async function getDataAndSave(forceUpdate = true) {
       }
     }); */
 
-    console.log(`Saved data of ${date.label} ✓`);
+    console.log(`[Cron] Saved data of ${date.label} ✓`);
   }
 
   return isSucceed;

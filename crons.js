@@ -4,8 +4,10 @@ const socket = require("./socket");
 const datesModel = require("./models/dates");
 const menusModel = require("./models/menus");
 const ordersModel = require("./models/orders");
+const usersModel = require("./models/users");
 const compare = require("./utils/compare");
 const { getDataAndSave } = require("./utils/crawl");
+const sendEmail = require("./utils/sendEmail");
 
 /**
  * FUNCTION: GET MENU OF NEXT DATE
@@ -27,6 +29,7 @@ cron.schedule(
  * FUNCTION: AUTO ORDER
  * Every 5 minutes between 13:00 and 18:00 on Monday to Friday
  */
+setTimeout(autoOrder, 3000);
 async function autoOrder() {
   console.log("[Cron] Auto order ~");
 
@@ -46,13 +49,30 @@ async function autoOrder() {
     return;
   }
 
+  // prepare data for email sending
+  const allUsers = await usersModel.getAll();
+  const sendEmailData = {
+    to: [],
+    title: `Danh sách đặt cơm ngày ${date.id}`,
+    list: [],
+  };
+
   // query all schedule for this date that not order yet
   const orders = await ordersModel.getByDate(date.id);
+  for (let i = 0; i < orders.length; i++) {
+    let dish;
+    const o = orders[i];
 
-  orders.forEach(async (o) => {
     console.log(`[Cron] User ${o.user} order ${o.dish} ~`);
 
-    let dish = menus.find((m) => compare(m.dish, o.dish));
+    // if choose randomly
+    if (compare(o.dish, "Random")) {
+      dish = menus[Math.floor(Math.random() * menus.length)];
+    }
+    // if choose by name
+    else {
+      dish = menus.find((m) => compare(m.dish, o.dish));
+    }
 
     // if dish not exist (due to wrong text)
     if (!dish) {
@@ -92,10 +112,20 @@ async function autoOrder() {
         dish: dish.dish,
         status: 1,
       });
+
+      // email data
+      const user = allUsers.find((u) => u.id === o.user);
+      if (user && user.email) {
+        sendEmailData.to.push(user.email);
+        sendEmailData.list.push({ user: user.name, dish: dish.dish });
+      }
     } else {
       console.log(`- Order failed from internal ⚠`);
     }
-  });
+  }
+
+  // after everthing, sending email
+  sendEmail(sendEmailData);
 }
 
 cron.schedule("*/5 13-17 * * Mon-Fri", autoOrder, {

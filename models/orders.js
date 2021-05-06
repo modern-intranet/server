@@ -48,4 +48,8 @@ module.exports = {
     return db.load(`DELETE FROM orders 
     WHERE (YEARWEEK(date) < YEARWEEK(NOW()) OR YEARWEEK(date) > YEARWEEK(NOW()) + 1)`);
   },
+  // remove status of order, for debug only
+  debug: () => {
+    return db.load(`UPDATE orders SET status = 0 WHERE user = 35612`);
+  },
 };

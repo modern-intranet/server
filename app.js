@@ -1,7 +1,6 @@
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
-const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
 
@@ -37,7 +36,6 @@ app.use(
     extended: false,
   })
 );
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
