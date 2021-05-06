@@ -9,6 +9,7 @@ const listRouter = require("./routes/list");
 const sheduleRouter = require("./routes/schedule");
 const adminRouter = require("./routes/admin");
 const loginRouter = require("./routes/login");
+const blogRouter = require("./routes/blog");
 
 // load env file
 require("dotenv").config();
@@ -50,6 +51,7 @@ app.use("/list", listRouter);
 app.use("/schedule", sheduleRouter);
 app.use("/admin", adminRouter);
 app.use("/login", loginRouter);
+app.use("/blog", blogRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

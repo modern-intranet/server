@@ -1,7 +1,7 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  background-image: radial-gradient(#c6c9ff 1px, transparent 1px),
-    radial-gradient(#c6c9ff 1px, #f3f3f3 1px);
+  background-image: radial-gradient(#dadbff 1px, transparent 1px),
+    radial-gradient(#dadbff 1px, #f3f3f3 1px);
   background-size: 40px 40px;
   background-position: 0 0, 20px 20px;
 }
@@ -17,13 +17,14 @@ a {
 
 nav {
   background-color: #f8f8f8;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.05);
   z-index: 1;
 }
 
 /* index page */
 .bootstrap-select {
   margin-top: 4px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.05);
 }
 
 .dropdown-menu.open {
@@ -108,4 +109,18 @@ table {
   float: right;
   margin-right: 4px;
   cursor: pointer;
+}
+
+/* blog pages */
+.dropdown-menu .active a {
+  color: white !important;
+}
+
+.text-content {
+  font-size: 16px;
+  line-height: 28px;
+}
+
+.new-line {
+  height: 10px;
 }

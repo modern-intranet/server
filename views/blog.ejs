@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Intranet</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <link rel="icon" href="images/icon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+
+    <!-- jQuery -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+    />
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button
+            type="button"
+            class="navbar-toggle"
+            data-toggle="collapse"
+            data-target="#bs-example-navbar-collapse-1"
+          >
+            <span class="sr-only">Mở thanh điều hướng</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Modern Intranet</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Đặt cơm</a></li>
+            <li><a href="/list">Danh sách đã đặt</a></li>
+            <li><a href="/schedule">Đặt cơm tự động</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown" class="active">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                >Thông tin <span class="caret"></span
+              ></a>
+              <ul class="dropdown-menu" role="menu">
+                <li class="active">
+                  <a href="/blog/guide">Hướng dẫn sử dụng</a>
+                </li>
+                <li><a href="/blog/guide#diagram">Cách hoạt động</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div style="margin: 72px 36px">
+      <h4>Giới thiệu</h4>
+      <div class="text-content">
+        ✨ Modern Intranet là công cụ đặt cơm cho được hoạt động dựa trên
+        <a href="https://intranet.ved.com.vn" target="_blank"><b>Intranet</b></a
+        >, được tạo ra nhằm khắc phục những khuyết điểm của hệ thống hiện tại.
+        <div class="new-line"></div>
+
+        ✨ Đặt cơm trên này cũng chính là đặt cơm trên Intranet. Vì sử dụng
+        chính những API của Intranet nên sẽ không có trường hợp đặt thành công
+        nhưng trên Intranet lại không ghi nhận.
+        <div class="new-line"></div>
+
+        ✨ Do đó vẫn phải tuân thủ khung giờ đặt cơm. Sau khung giờ này, đặt cơm
+        vẫn thành công, nhưng lúc này các chị <b>Lễ Tân</b> đã xuất danh sách.
+      </div>
+      <br />
+      <br />
+
+      <h4>Modern Intranet giải quyết vấn đề gì❓</h4>
+      <div class="text-content">
+        ✨ Hỗ trợ giao diện di động.
+        <div class="new-line"></div>
+        ✨ Không cần dùng mạng trong hoặc VPN.
+        <div class="new-line"></div>
+        ✨ Đặt cơm <b>mọi lúc mọi nơi</b>, kể cả đang ở ngoài đường.
+        <div class="new-line"></div>
+        ✨ Cho phép đặt lịch đặt cơm tự động. <b>Đặt trước cả tuần</b> như
+        Foody, có thể thay đổi bất cứ lúc nào, miễn là chưa tới ngày đó.
+        <div class="new-line"></div>
+        ✨ Có email thông báo khi đặt cơm tự động thành công.
+      </div>
+      <br />
+      <br />
+
+      <h4>Ai là người nên dùng Modern Intranet❓</h4>
+      <div class="text-content">
+        ✨ Những ai hay quên đặt cơm hàng ngày.
+        <div class="new-line"></div>
+        ✨ Những ai hay bận lúc khung giờ đặt cơm.
+        <div class="new-line"></div>
+        ✨ Tất cả mọi người đều có thể sử dụng, kể cả <b>Foody</b>.
+      </div>
+      <br />
+      <br />
+
+      <h4>Nhược điểm của Modern Intranet</h4>
+      <div class="text-content">
+        ✨ Hệ thống chưa được kiểm thử ổn định. Do đó nên cần mọi người dùng thử
+        😁.
+        <div class="new-line"></div>
+        ✨ Nếu chiều hôm đó không thấy email báo đặt cơm thành công thì nên vào
+        kiểm tra.
+        <div class="new-line"></div>
+        ✨ Luôn phải có một máy tính chạy server ở mạng trong.
+      </div>
+      <br />
+      <br />
+
+      <h4 id="diagram">Cách hoạt động của Modern Intranet</h4>
+      <br />
+      <img id src="/images/diagram.png" style="width: 96%" />
+      <br />
+      <br />
+
+      <div class="text-content">
+        ✨ Source code:
+        <a href="https://github.com/modern-intranet" target="_blank"
+          ><b>https://github.com/modern-intranet</b></a
+        >.
+      </div>
+    </div>
+
+    <!-- Parse variables -->
+    <script></script>
+  </body>
+</html>
