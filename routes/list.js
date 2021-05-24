@@ -4,11 +4,13 @@ const router = express.Router();
 const datesModel = require("../models/dates");
 const socket = require("../socket");
 
-// main route
+/**
+ * Main view route
+ */
 router.get("/", async (req, res) => {
   if (!req.session.user) return res.redirect("/login");
 
-  // get selected date (if has)
+  /* Get selected date (if has) */
   const date = req.session.date;
 
   res.render("list", {
@@ -16,14 +18,18 @@ router.get("/", async (req, res) => {
   });
 });
 
-// choose date action
+/**
+ * Get list order of cached date
+ */
 router.post("/", async (req, res) => {
   req.session.date = req.body.date;
 
   res.redirect("/list");
 });
 
-// get order list of a date
+/**
+ * Get list order of a date
+ */
 router.post("/of/:date", async (req, res) => {
   const date = req.params.date;
   const response = await socket.getList({ date });

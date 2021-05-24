@@ -4,21 +4,25 @@ const passport = require("passport");
 
 const usersModel = require("../models/users");
 
-// main route
+/**
+ * Main view route
+ */
 router.get("/", async (req, res) => {
   if (!req.session.user) return res.redirect("/login/google");
 
   res.redirect("/");
 });
 
-// login failed
+/**
+ * Login failed
+ */
 router.get("/failed", async (req, res) => {
   res.render("login", {
     statusCode: 403,
   });
 });
 
-// login succeed but need to choose username
+/* Login succeed but need to choose username */
 router.get("/choose", async (req, res) => {
   if (!req.session.passport) return res.redirect("/login/google");
 
@@ -30,7 +34,7 @@ router.get("/choose", async (req, res) => {
   });
 });
 
-// choose name for new user
+/* Choose name for new user */
 router.post("/choose", async (req, res) => {
   if (!req.session.passport) return res.redirect("/login/google");
 
@@ -47,7 +51,7 @@ router.post("/choose", async (req, res) => {
   }
 });
 
-// google login
+/* Google login section */
 router.get("/google", passport.authenticate("google", { scope: ["email"] }));
 
 router.get(
@@ -60,15 +64,14 @@ router.get(
     const email = req.session.passport.user.email;
     const user = await usersModel.getByEmail(email);
 
-    // already exists in database
+    /* User already exists in database */
     if (user) {
       req.session.user = user;
-      res.redirect("/");
+      return res.redirect("/");
     }
-    // not exists in database
-    else {
-      res.redirect("/login/choose");
-    }
+
+    /* User not exists in database */
+    res.redirect("/login/choose");
   }
 );
 

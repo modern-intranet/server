@@ -10,46 +10,39 @@ const { getDataAndSave } = require("./utils/crawl");
 const sendEmail = require("./utils/sendEmail");
 
 /**
- * FUNCTION: GET MENU OF NEXT DATE
+ * Get menu of the closet next date
  * Every 5 minutes between 13:00 and 18:00 on Monday to Friday
  */
-cron.schedule(
-  "*/5 13-17 * * Mon-Fri",
-  () => {
-    console.log("[Cron] Get menu of next date ~");
-    getDataAndSave();
-  },
-  {
-    scheduled: true,
-    timezone: "Asia/Ho_Chi_Minh",
-  }
-);
+cron.schedule("*/5 13-17 * * Mon-Fri", getDataAndSave, {
+  scheduled: true,
+  timezone: "Asia/Ho_Chi_Minh",
+});
+setTimeout(getDataAndSave, 3000);
 
 /**
- * FUNCTION: AUTO ORDER
+ * Auto order
  * Every 5 minutes between 13:00 and 18:00 on Monday to Friday
  */
-setTimeout(autoOrder, 3000);
 async function autoOrder() {
   console.log("[Cron] Auto order ~");
 
-  // get target date
+  /* Get target date */
   const date = await datesModel.getNext();
 
-  // if that (closet future) date is not avaiable yet
+  /* If that (closet future) date is not avaiable yet */
   if (!date) {
-    console.log("[Cron] Menu is not ready ⚠");
+    console.log("- Menu is not ready ⚠");
     return;
   }
 
-  // get menu of that date
+  /* Get menu of that date */
   const menus = await menusModel.getByDate(date.id);
   if (!menus.length) {
-    console.log("[Cron] Menu is empty ⚠");
+    console.log("- Menu is empty ⚠");
     return;
   }
 
-  // prepare data for email sending
+  /* Pepare data for email sending */
   const allUsers = await usersModel.getAll();
   const sendEmailData = {
     to: [],
@@ -57,37 +50,36 @@ async function autoOrder() {
     list: [],
   };
 
-  // query all schedule for this date that not order yet
+  /* Query all schedule for this date that not order yet */
   const orders = await ordersModel.getByDate(date.id);
   for (let i = 0; i < orders.length; i++) {
     let dish;
     const o = orders[i];
 
-    console.log(`[Cron] User ${o.user} order ${o.dish} ~`);
+    console.log(`- User ${o.user} order ${o.dish} ~`);
 
-    // if choose randomly
+    /* If choose randomly */
     if (compare(o.dish, "Random")) {
       dish = menus[Math.floor(Math.random() * menus.length)];
-    }
-    // if choose by name
-    else {
+    } else {
+      /* If choose by name */
       dish = menus.find((m) => compare(m.dish, o.dish));
     }
 
-    // if dish not exist (due to wrong text)
+    /* If dish not exist (due to wrong text) */
     if (!dish) {
       console.log(`- Not exist in menu, choosing first option ⚠`);
       dish = menus.find((m) => !!m.id);
     }
 
-    // if dish doesn't have id (abnormal case)
+    /* If dish doesn't have id (abnormal case) */
     if (!dish.id) {
       console.log(`- Exists but no id, choosing first option ⚠`);
       dish = menus.find((m) => !!m.id);
     }
 
-    // after fallback to first option
-    // if dish still doesn't have id, skip user
+    /* After fallback to first option */
+    /* If dish still doesn't have id, skip user */
     if (!dish) {
       console.log(`- No menu valid, skip this user ⚠`);
       return;
@@ -99,13 +91,13 @@ async function autoOrder() {
       user_id: o.user,
     };
 
-    // set food through intranet api
+    /* Set food through internal server */
     const { statusCode } = await socket.setFood(payload);
 
     if (statusCode === 200) {
       console.log(`- Order succeed ✓`);
 
-      // update status of order
+      /* Update status of order */
       ordersModel.addOrUpdate({
         user: +o.user,
         date: date.id,
@@ -113,7 +105,7 @@ async function autoOrder() {
         status: 1,
       });
 
-      // email data
+      /* Set email data */
       const user = allUsers.find((u) => u.id === o.user);
       if (user && user.email) {
         sendEmailData.to.push(user.email);
@@ -124,7 +116,7 @@ async function autoOrder() {
     }
   }
 
-  // after everthing, sending email
+  /* After everthing, sending email */
   sendEmail(sendEmailData);
 }
 

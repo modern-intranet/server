@@ -4,7 +4,7 @@ function promiseTimeout(promise, ms = 5000) {
       clearTimeout(id);
       resolve({
         statusCode: -1,
-        data: `Timeout in ${ms} ms`,
+        data: `- Timeout in ${ms} ms ⚠`,
       });
     }, ms);
   });

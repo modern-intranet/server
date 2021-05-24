@@ -20,7 +20,7 @@ passport.use(
       process.nextTick(() => {
         const email = profile.emails[0] ? profile.emails[0].value : "";
 
-        // whilelist domain
+        /* Whilelist domain */
         if (
           [
             "@seatalk.biz",
@@ -28,6 +28,7 @@ passport.use(
             "@foody.com",
             "@sea.com",
             "@garena.com",
+            "@shopee.com",
           ].some((domain) => email.includes(domain))
         ) {
           return done(null, { email });

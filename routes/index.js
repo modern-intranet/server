@@ -8,7 +8,9 @@ const datesModel = require("../models/dates");
 const ordersModel = require("../models/orders");
 const { getDataAndSave } = require("../utils/crawl");
 
-// message after ordering
+/**
+ * Message after ordering
+ */
 const getOrderResultMessage = (code) => {
   switch (code) {
     case 200:
@@ -22,19 +24,21 @@ const getOrderResultMessage = (code) => {
   }
 };
 
-// main route
+/**
+ * Main view route
+ */
 router.get("/", async (req, res) => {
   if (!req.session.user) return res.redirect("/login");
   const userId = req.session.user.id;
 
-  // get message of recent action
+  /* Get message of recent action */
   const message = getOrderResultMessage(req.session.orderCode);
   req.session.orderCode = undefined;
 
-  // get target date (if has)
+  /* Get target date (if has) */
   const date = await datesModel.getNext();
 
-  // no menu yet
+  /* No menu yet */
   if (!date) {
     res.render("index", {
       date: "",
@@ -43,29 +47,29 @@ router.get("/", async (req, res) => {
       message,
     });
 
-    // try to get menu
-    getDataAndSave();
+    /* Try to get menu */
+    return getDataAndSave();
   }
-  // have menu
-  else {
-    // filter users
-    let filteredUsers = await usersModel.getAll();
-    if (userId !== 35612) {
-      filteredUsers = filteredUsers.filter((u) => u.id === userId);
-    }
 
-    res.render("index", {
-      date,
-      users: filteredUsers,
-      menus: (await menusModel.getByDate(date.id)).filter((x) => !!x.id),
-      message,
-    });
+  /* Have menu */
+  let filteredUsers = await usersModel.getAll();
+  if (userId !== 35612) {
+    filteredUsers = filteredUsers.filter((u) => u.id === userId);
   }
+
+  res.render("index", {
+    date,
+    users: filteredUsers,
+    menus: (await menusModel.getByDate(date.id)).filter((x) => !!x.id),
+    message,
+  });
 });
 
-// order action
+/**
+ * Order food
+ */
 router.post("/", async (req, res) => {
-  // do it via intranet api
+  /* Do it via internal server  */
   const { statusCode } = await socket.setFood({
     date: req.body.date,
     food: req.body.dish,
@@ -74,7 +78,7 @@ router.post("/", async (req, res) => {
 
   req.session.orderCode = statusCode;
 
-  // save order to database
+  /* Save order to database */
   if (statusCode === 200) {
     ordersModel.addOrUpdate({
       user: +req.body.user,
@@ -87,7 +91,7 @@ router.post("/", async (req, res) => {
   res.redirect("/");
 });
 
-// get ordered dish of a user on a date
+/* Get ordered dish of a user on a date */
 router.post("/menu/:userId/:date", async (req, res) => {
   const userId = +req.params.userId;
   const date = req.params.date;

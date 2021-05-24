@@ -7,7 +7,9 @@ const ordersModel = require("../models/orders");
 const menusModel = require("../models/menus");
 const { getListAndSyncOrders } = require("../utils/crawl");
 
-// message after scheduling
+/**
+ * Message after scheduling
+ */
 const getScheduleResultMessage = (code) => {
   switch (code) {
     case 200:
@@ -21,14 +23,18 @@ const getScheduleResultMessage = (code) => {
   }
 };
 
-// get date of current weekdays
+/**
+ * Get dates of current weekdays
+ */
 function getThisWeekDates() {
   const result = [];
   for (let i = 1; i <= 5; i++) result.push(dayjs().day(i).format("YYYY-MM-DD"));
   return result;
 }
 
-// get date of next weekdays
+/**
+ * Get dates of next weekdays
+ */
 function getNextWeekDates() {
   const result = [];
   for (let i = 8; i <= 12; i++)
@@ -36,19 +42,21 @@ function getNextWeekDates() {
   return result;
 }
 
-// main route
+/**
+ * Main view route
+ */
 router.get("/", async (req, res) => {
   if (!req.session.user) return res.redirect("/login");
   const userId = req.session.user.id;
 
-  // get message of recent action
+  /* Get message of recent action */
   const message = getScheduleResultMessage(req.session.scheduleCode);
   req.session.scheduleCode = undefined;
 
-  // get all menus of this week and next week
+  /* Get all menus of this week and next week */
   const menus = await menusModel.getByThisAndNextWeek();
 
-  // then fullfil if not complete
+  /* Fullfil if not complete */
   const thisWeekMenu = getThisWeekDates().map((date) => ({
     date,
     menus: menus.filter((m) => m.date === date),
@@ -59,7 +67,7 @@ router.get("/", async (req, res) => {
     menus: menus.filter((m) => m.date === date),
   }));
 
-  // filter users
+  /* Filter admin */
   let filteredUsers = await usersModel.getAll();
   if (userId !== 35612) {
     filteredUsers = filteredUsers.filter((u) => u.id === userId);
@@ -73,19 +81,20 @@ router.get("/", async (req, res) => {
   });
 });
 
-// set schedule
+/**
+ * Set schedule
+ */
 router.post("/", async (req, res) => {
   try {
     for (let date in req.body) {
-      // skip user field
+      /* Skip user field */
       if (date === "user") continue;
 
-      // delete if no order on `date`
+      /* Delete if no order on `date` */
       if (!req.body[date]) {
         await ordersModel.delete({ date, user: req.body.user });
-      }
-      // otherwise, add or update on existed record
-      else {
+      } else {
+        /* Otherwise, add or update on existed record */
         await ordersModel.addOrUpdate({
           date,
           user: req.body.user,
@@ -102,14 +111,16 @@ router.post("/", async (req, res) => {
   res.redirect("/schedule");
 });
 
-// get order schedule of a user
+/**
+ * Get order schedule of a user
+ */
 router.post("/of/:userId", async (req, res) => {
   const userId = req.params.userId;
 
-  // get all orders of this week and next week
+  /* Get all orders of this week and next week */
   const orders = await ordersModel.getByUser(userId);
 
-  // then fullfil if not complete
+  /* Fullfil if not complete */
   const thisWeekData = getThisWeekDates().map((date) => ({
     date,
     user: userId,
@@ -133,7 +144,9 @@ router.post("/of/:userId", async (req, res) => {
   });
 });
 
-// sync order list from intranet to database
+/**
+ * Sync order list from intranet to database
+ */
 router.post("/sync/:date", async (req, res) => {
   const date = req.params.date;
   res.send(await getListAndSyncOrders(date));

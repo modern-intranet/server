@@ -21,9 +21,8 @@ nav {
   z-index: 1;
 }
 
-/* index page */
+/* Order page */
 .bootstrap-select {
-  margin-top: 4px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.05);
 }
 
@@ -54,7 +53,7 @@ form {
   color: maroon;
 }
 
-/* list page */
+/* List orders page */
 table {
   margin-top: 72px;
   border: 1px solid #dbdbdb;
@@ -90,7 +89,7 @@ table {
   margin-left: 16px;
 }
 
-/* schedule page */
+/* Schedule page */
 #two-columns {
   display: flex;
   flex-wrap: wrap;
@@ -111,7 +110,7 @@ table {
   cursor: pointer;
 }
 
-/* blog pages */
+/* Blog pages */
 .dropdown-menu .active a {
   color: white !important;
 }

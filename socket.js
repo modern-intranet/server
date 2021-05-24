@@ -2,36 +2,58 @@ const timeoutPromise = require("./utils/timeoutPromise");
 const ACTIONS = require("./constants/actions");
 const datesModel = require("./models/dates");
 
-var socket;
+let io;
+let socket;
 
-function setupSocket(io) {
-  io.on("connect", async (sk) => {
-    // intranet connection
-    sk.on(ACTIONS.I_AM_INTRANET, async () => {
-      io.socketsLeave(ACTIONS.I_AM_INTRANET);
-      sk.join(ACTIONS.I_AM_INTRANET);
-      socket = sk;
+/**
+ * Setup socket.io
+ */
+function setupSocket(_io) {
+  io = _io;
 
-      // debugging
-      const intranetRooms = io.sockets.adapter.rooms.get(ACTIONS.I_AM_INTRANET);
+  /* Internal server connected */
+  io.on("connect", async (_socket) => {
+    _socket.on(ACTIONS.INTRANET, async () => {
+      io.socketsLeave(ACTIONS.INTRANET);
+      _socket.join(ACTIONS.INTRANET);
+      socket = _socket;
+
+      /* Debugging intranet clients */
+      const intranetRooms = io.sockets.adapter.rooms.get(ACTIONS.INTRANET);
       const roomSize = intranetRooms ? intranetRooms.size : 0;
-      console.log(`Intranet room size is ${roomSize} ${roomSize ? "✓" : "⚠"}`);
+      console.log(`Intranet clients is ${roomSize} ${roomSize ? "✓" : "⚠"}`);
 
       await validateCookie();
     });
 
-    sk.on("forceDisconnect", () => {
-      sk.disconnect();
+    _socket.on("forceDisconnect", () => {
+      _socket.disconnect();
     });
 
-    sk.on("diconnect", () => {
+    _socket.on("diconnect", () => {
       socket = null;
     });
   });
 }
 
+/**
+ * Check if socket variable is still valid
+ */
+function validateSocket() {
+  if (!socket || !socket.connected) {
+    console.log("[Socket] Leave all intranet clients");
+    io.socketsLeave(ACTIONS.INTRANET);
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Validate cookie of internal server
+ */
 async function validateCookie() {
-  if (!socket || !socket.connected) return false;
+  if (!validateSocket()) return false;
+
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
@@ -45,8 +67,12 @@ async function validateCookie() {
   );
 }
 
+/**
+ * Get menu data of a date
+ */
 async function getData(payload) {
-  if (!socket || !socket.connected) return false;
+  if (!validateSocket()) return false;
+
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
@@ -60,8 +86,12 @@ async function getData(payload) {
   );
 }
 
+/**
+ * Order food
+ */
 async function setFood(payload) {
-  if (!socket || !socket.connected) return false;
+  if (!validateSocket()) return false;
+
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
@@ -75,8 +105,12 @@ async function setFood(payload) {
   );
 }
 
+/**
+ * Get list of ordered of a date
+ */
 async function getList(payload) {
-  if (!socket || !socket.connected) return false;
+  if (!validateSocket()) return false;
+
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
@@ -90,8 +124,12 @@ async function getList(payload) {
   );
 }
 
+/**
+ * Get list of ordered of all date (500 records)
+ */
 async function getListAll() {
-  if (!socket || !socket.connected) return false;
+  if (!validateSocket()) return false;
+
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
@@ -105,8 +143,12 @@ async function getListAll() {
   );
 }
 
+/**
+ * Get list of ordered of the closet next date
+ */
 async function getListNext() {
-  if (!socket || !socket.connected) return false;
+  if (!validateSocket()) return false;
+
   const date = await datesModel.getLast();
   return date ? getList({ date: date.id }) : getListAll();
 }

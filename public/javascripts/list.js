@@ -1,5 +1,5 @@
 window.onload = () => {
-  // setup datepicker
+  /* Setup datepicker */
   $(function () {
     $("#datepicker")
       .datepicker({
@@ -12,7 +12,7 @@ window.onload = () => {
       });
   });
 
-  // use ajax to get table list
+  /* Use ajax to get table list */
   $.post(`/list/of/${date}`, (data) => {
     try {
       if (data.data.table.includes("<td>")) {

@@ -5,31 +5,50 @@ const usersModel = require("../models/users");
 const socket = require("../socket");
 
 async function getDataAndSave(forceUpdate = true) {
+  console.log("[Cron] Getting menu of next date ~");
+
   const { statusCode, data } = await socket.getData();
   const isSucceed = statusCode === 200;
 
   if (isSucceed) {
-    /** <unstabe_logic> */
-    // only support one day
+    const allUsers = await usersModel.getAll();
+
+    /* Add new user to database */
+    data.users.forEach(async (user) => {
+      try {
+        if (!allUsers.some((u) => u.id === +user.value)) {
+          console.log(`- Add user ${user.value} ${user.label}`);
+
+          await usersModel.add({
+            id: user.value,
+            name: user.label,
+          });
+        }
+      } catch (err) {
+        console.log("- Error when adding user ⚠");
+        console.log(`- ${err.message}`);
+      }
+    });
+
+    /* Validate date */
     const date = data.dates[0];
     if (!date) return false;
 
-    // check if that day data is already existed
-    const dateInDB = await datesModel.getById(date.value);
-    if (dateInDB && !forceUpdate) return false;
+    /* Skip if data already exists */
+    if (!(await datesModel.getById(date.value)) && !forceUpdate) return false;
 
-    // add date to database
+    /* Add date to database */
     try {
       await datesModel.add({
         id: date.value,
         name: date.label,
       });
     } catch (err) {
-      console.log("Error when adding date ⚠");
+      console.log("- Error when adding date ⚠");
       console.log(`- ${err.message}`);
     }
 
-    // add menus to database
+    /* Add menu to database */
     data.dishes.forEach(async (dish) => {
       try {
         await menusModel.addOrUpdate({
@@ -38,58 +57,43 @@ async function getDataAndSave(forceUpdate = true) {
           id: dish.value,
         });
       } catch (err) {
-        console.log("Error when adding menu ⚠");
+        console.log("- Error when adding menu ⚠");
         console.log(`- ${err.message}`);
       }
     });
 
-    /** <unstabe_logic> */
-    /* add users to database
-    data.users.forEach(async (user) => {
-      try {
-        await usersModel.add({
-          id: user.value,
-          name: user.label,
-        });
-      } catch (err) {
-        console.log("Error when adding user ⚠");
-        console.log(`- ${err.message}`);
-      }
-    }); */
-
-    console.log(`[Cron] Saved data of ${date.label} ✓`);
+    console.log(`- Saved data of ${date.label} ✓`);
   }
 
   return isSucceed;
 }
 
-// sync intranet order list to database
+/**
+ * Sync intranet order list to database
+ */
 async function getListAndSyncOrders(date) {
   try {
     const response = await socket.getList({ date });
     if (!response || response.statusCode !== 200) return;
 
-    // use normal for loop for await async to work as expected
-    for (let i = 0; i < response.data.list.length; i++) {
-      const record = response.data.list[i];
+    for (let record of response.data.list) {
       const user = await usersModel.getByUsername(record.username);
 
-      // save order to database
-      user &&
-        (await ordersModel.addOrUpdate({
+      /* Save order to database */
+      if (user) {
+        await ordersModel.addOrUpdate({
           user: user.id,
           date: record.date,
           dish: record.dish,
           status: 1,
-        }));
+        });
+      }
     }
     return true;
   } catch {
     return false;
   }
 }
-
-setTimeout(() => getDataAndSave(), 4000);
 
 module.exports = {
   getDataAndSave,
