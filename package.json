@@ -2,17 +2,17 @@
   "name": "intranet-server",
   "version": "1.0.0",
   "scripts": {
-    "start": "pm2 start ./bin/www --watch",
-    "stop": "pm2 stop ./bin/www",
-    "delete": "pm2 delete ./bin/www",
-    "list": "pm2 list",
-    "start:dev": "nodemon ./bin/www"
+    "pm2:start": "pm2 start ./bin/www --watch",
+    "pm2:stop": "pm2 stop ./bin/www",
+    "pm2:delete": "pm2 delete ./bin/www",
+    "pm2:list": "pm2 list",
+    "start": "nodemon ./bin/www"
   },
   "engines": {
-    "node": "14.x.x"
+    "node": "12.x.x"
   },
   "dependencies": {
-    "dayjs": "^1.10.4",
+    "dayjs": "^1.10.5",
     "dotenv": "^8.6.0",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
@@ -24,7 +24,6 @@
     "nodemailer": "^6.6.1",
     "passport": "^0.4.1",
     "passport-google-oauth": "^2.0.0",
-    "pm2": "^4.5.6",
     "socket.io": "^4.1.2",
     "xlsx": "^0.16.9"
   },

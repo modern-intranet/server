@@ -34,6 +34,8 @@ function setupSocket(_io) {
       socket = null;
     });
   });
+
+  console.log("Initialize socket.io");
 }
 
 /**
@@ -42,7 +44,7 @@ function setupSocket(_io) {
 function validateSocket() {
   if (!socket || !socket.connected) {
     console.log("[Socket] Leave all intranet clients");
-    io.socketsLeave(ACTIONS.INTRANET);
+    if (io) io.socketsLeave(ACTIONS.INTRANET);
     return false;
   }
   return true;
