@@ -2,8 +2,8 @@ const timeoutPromise = require("./utils/timeoutPromise");
 const ACTIONS = require("./constants/actions");
 const datesModel = require("./models/dates");
 
-let io;
-let socket;
+var io;
+var socket;
 
 /**
  * Setup socket.io
@@ -13,17 +13,15 @@ function setupSocket(_io) {
 
   /* Internal server connected */
   io.on("connect", async (_socket) => {
-    _socket.on(ACTIONS.INTRANET, async () => {
-      io.socketsLeave(ACTIONS.INTRANET);
-      _socket.join(ACTIONS.INTRANET);
+    _socket.on(ACTIONS.I_AM_INTRANET, async () => {
+      io.socketsLeave(ACTIONS.I_AM_INTRANET);
+      _socket.join(ACTIONS.I_AM_INTRANET);
       socket = _socket;
 
       /* Debugging intranet clients */
-      const intranetRooms = io.sockets.adapter.rooms.get(ACTIONS.INTRANET);
+      const intranetRooms = io.sockets.adapter.rooms.get(ACTIONS.I_AM_INTRANET);
       const roomSize = intranetRooms ? intranetRooms.size : 0;
       console.log(`Intranet clients is ${roomSize} ${roomSize ? "✓" : "⚠"}`);
-
-      await validateCookie();
     });
 
     _socket.on("forceDisconnect", () => {
@@ -44,7 +42,7 @@ function setupSocket(_io) {
 function validateSocket() {
   if (!socket || !socket.connected) {
     console.log("[Socket] Leave all intranet clients");
-    if (io) io.socketsLeave(ACTIONS.INTRANET);
+    if (io) io.socketsLeave(ACTIONS.I_AM_INTRANET);
     return false;
   }
   return true;
@@ -53,13 +51,13 @@ function validateSocket() {
 /**
  * Validate cookie of internal server
  */
-async function validateCookie() {
+async function validateCookie(payload) {
   if (!validateSocket()) return false;
 
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
-      socket.emit(ACTIONS.VALIDATE_COOKIE, null, (answer) => {
+      socket.emit(ACTIONS.VALIDATE_COOKIE, payload, (answer) => {
         if (!answered) {
           answered = true;
           resolve(answer);
@@ -129,13 +127,13 @@ async function getList(payload) {
 /**
  * Get list of ordered of all date (500 records)
  */
-async function getListAll() {
+async function getListAll(payload) {
   if (!validateSocket()) return false;
 
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
-      socket.emit(ACTIONS.GET_LIST_ALL, null, (answer) => {
+      socket.emit(ACTIONS.GET_LIST_ALL, payload, (answer) => {
         if (!answered) {
           answered = true;
           resolve(answer);
@@ -145,22 +143,11 @@ async function getListAll() {
   );
 }
 
-/**
- * Get list of ordered of the closet next date
- */
-async function getListNext() {
-  if (!validateSocket()) return false;
-
-  const date = await datesModel.getLast();
-  return date ? getList({ date: date.id }) : getListAll();
-}
-
 module.exports = {
   setupSocket,
   validateCookie,
   getData,
   setFood,
   getList,
-  getListNext,
   getListAll,
 };

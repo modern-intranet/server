@@ -48,7 +48,7 @@ router.get("/", async (req, res) => {
     });
 
     /* Try to get menu */
-    return getDataAndSave();
+    return getDataAndSave(req.session.user.department);
   }
 
   /* Have menu */
@@ -69,11 +69,14 @@ router.get("/", async (req, res) => {
  * Order food
  */
 router.post("/", async (req, res) => {
+  if (!req.session.user) return res.redirect("/login");
+
   /* Do it via internal server  */
   const { statusCode } = await socket.setFood({
     date: req.body.date,
     food: req.body.dish,
     user_id: req.body.user,
+    department: req.session.user.department,
   });
 
   req.session.orderCode = statusCode;

@@ -31,8 +31,13 @@ router.post("/", async (req, res) => {
  * Get list order of a date
  */
 router.post("/of/:date", async (req, res) => {
+  if (!req.session.user) return res.redirect("/login");
+
   const date = req.params.date;
-  const response = await socket.getList({ date });
+  const response = await socket.getList({
+    date,
+    department: req.session.user.department,
+  });
 
   res.send(response);
 });

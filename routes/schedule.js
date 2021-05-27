@@ -148,8 +148,10 @@ router.post("/of/:userId", async (req, res) => {
  * Sync order list from intranet to database
  */
 router.post("/sync/:date", async (req, res) => {
+  if (!req.session.user) return res.redirect("/login");
+
   const date = req.params.date;
-  res.send(await getListAndSyncOrders(date));
+  res.send(await getListAndSyncOrders(date, req.session.user.department));
 });
 
 module.exports = router;

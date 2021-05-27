@@ -20,7 +20,7 @@ router.get("/tqnghi@", async (req, res) => {
  * Upload menu from excel
  */
 router.post("/upload-menu", async (req, res) => {
-  console.log("[Admin] Uploading menu ~");
+  console.log("[Admin] Uploading menu...");
 
   const data = [];
   const form = new formidable.IncomingForm();
@@ -94,7 +94,7 @@ router.post("/upload-menu", async (req, res) => {
  * Delete menus and orders of last week
  */
 router.post("/purge-data", async (_, res) => {
-  console.log("[Admin] Purging data ~");
+  console.log("[Admin] Purging data...");
 
   try {
     await menusModel.deleteOldMenus();

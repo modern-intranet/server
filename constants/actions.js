@@ -1,5 +1,5 @@
 module.exports = {
-  INTRANET: "iAmIntranet",
+  I_AM_INTRANET: "iAmIntranet",
   VALIDATE_COOKIE: "validateCookie",
   GET_DATA: "getData",
   SET_FOOD: "setFood",

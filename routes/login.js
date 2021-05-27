@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const socket = require("../socket");
 
 const usersModel = require("../models/users");
 
@@ -68,6 +69,12 @@ router.get(
       /* User already exists in database */
       if (user) {
         req.session.user = user;
+
+        /* Check cookie of user department */
+        await socket.validateCookie({
+          department: user.department,
+        });
+
         return res.redirect("/");
       }
 

@@ -24,7 +24,7 @@ setTimeout(getDataAndSave, 3000);
  * Every 5 minutes between 13:00 and 18:00 on Monday to Friday
  */
 async function autoOrder() {
-  console.log("[Cron] Auto order ~");
+  console.log("[Cron] Auto order...");
 
   /* Get target date */
   const date = await datesModel.getNext();
@@ -56,7 +56,7 @@ async function autoOrder() {
     let dish;
     const o = orders[i];
 
-    console.log(`- User ${o.user} order ${o.dish} ~`);
+    console.log(`- User ${o.user} order ${o.dish}...`);
 
     /* If choose randomly */
     if (compare(o.dish, "Random")) {
@@ -85,10 +85,17 @@ async function autoOrder() {
       return;
     }
 
+    const user = allUsers.find((u) => u.id === o.user);
+    if (!user) {
+      console.log(`- User is not existed ⚠`);
+      return;
+    }
+
     const payload = {
       date: date.id,
       food: dish.id,
       user_id: o.user,
+      department: user.department,
     };
 
     /* Set food through internal server */
@@ -106,8 +113,7 @@ async function autoOrder() {
       });
 
       /* Set email data */
-      const user = allUsers.find((u) => u.id === o.user);
-      if (user && user.email) {
+      if (user.email) {
         sendEmailData.to.push(user.email);
         sendEmailData.list.push({ user: user.name, dish: dish.dish });
       }

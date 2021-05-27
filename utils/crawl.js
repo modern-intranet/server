@@ -4,10 +4,10 @@ const ordersModel = require("../models/orders");
 const usersModel = require("../models/users");
 const socket = require("../socket");
 
-async function getDataAndSave(forceUpdate = true) {
-  console.log("[Cron] Getting menu of next date ~");
+async function getDataAndSave(department, forceUpdate = true) {
+  console.log("[Cron] Getting menu of next date...");
 
-  const { statusCode, data } = await socket.getData();
+  const { statusCode, data } = await socket.getData({ department });
   const isSucceed = statusCode === 200;
 
   if (isSucceed) {
@@ -71,9 +71,12 @@ async function getDataAndSave(forceUpdate = true) {
 /**
  * Sync intranet order list to database
  */
-async function getListAndSyncOrders(date) {
+async function getListAndSyncOrders(date, department) {
   try {
-    const response = await socket.getList({ date });
+    const response = await socket.getList({
+      date,
+      department,
+    });
     if (!response || response.statusCode !== 200) return;
 
     for (let record of response.data.list) {
