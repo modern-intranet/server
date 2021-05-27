@@ -61,17 +61,21 @@ router.get(
     failureRedirect: "/login/failed",
   }),
   async (req, res) => {
-    const email = req.session.passport.user.email;
-    const user = await usersModel.getByEmail(email);
+    try {
+      const email = req.session.passport.user.email;
+      const user = await usersModel.getByEmail(email);
 
-    /* User already exists in database */
-    if (user) {
-      req.session.user = user;
-      return res.redirect("/");
+      /* User already exists in database */
+      if (user) {
+        req.session.user = user;
+        return res.redirect("/");
+      }
+
+      /* User not exists in database */
+      res.redirect("/login/choose");
+    } catch {
+      res.redirect("/login/failed#database");
     }
-
-    /* User not exists in database */
-    res.redirect("/login/choose");
   }
 );
 

@@ -20,13 +20,18 @@ module.exports = {
   load: (sql) => {
     return new Promise((resolve, reject) => {
       const connection = createConnection();
-      connection.connect();
-      connection.query(sql, (error, results) => {
-        if (error) reject(error);
-        else {
-          resolve(results);
+      connection.connect((err) => {
+        if (err) {
+          reject("Cannot connect database");
+        } else {
+          connection.query(sql, (error, results) => {
+            if (error) reject(error);
+            else {
+              resolve(results);
+            }
+            connection.end();
+          });
         }
-        connection.end();
       });
     });
   },
@@ -34,43 +39,18 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const sql = `INSERT IGNORE INTO ${tablename} SET ?`;
       const connection = createConnection();
-      connection.connect();
-      connection.query(sql, entity, (error, value) => {
-        if (error) reject(error);
-        else {
-          resolve(value.insertId);
+      connection.connect((err) => {
+        if (err) {
+          reject("Cannot connect database");
+        } else {
+          connection.query(sql, entity, (error, value) => {
+            if (error) reject(error);
+            else {
+              resolve(value.insertId);
+            }
+            connection.end();
+          });
         }
-        connection.end();
-      });
-    });
-  },
-  update: (tablename, idField, entity) => {
-    return new Promise((resolve, reject) => {
-      const id = entity[idField];
-      delete entity[idField];
-      const sql = `UPDATE ${tablename} SET ? WHERE ${idField} = ?`;
-      const connection = createConnection();
-      connection.connect();
-      connection.query(sql, [entity, id], (error, value) => {
-        if (error) reject(error);
-        else {
-          resolve(value.changeRows);
-        }
-        connection.end();
-      });
-    });
-  },
-  delete: (tablename, idField, id) => {
-    return new Promise((resolve, reject) => {
-      const sql = `DELETE FROM ${tablename} WHERE ${idField} = ?`;
-      const connection = createConnection();
-      connection.connect();
-      connection.query(sql, id, (error, value) => {
-        if (error) reject(error);
-        else {
-          resolve(value.affectedRows);
-        }
-        connection.end();
       });
     });
   },
