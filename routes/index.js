@@ -45,6 +45,7 @@ router.get("/", async (req, res) => {
       users: [],
       menus: [],
       message,
+      isAdmin: userId === 35612,
     });
 
     /* Try to get menu */
@@ -62,6 +63,7 @@ router.get("/", async (req, res) => {
     users: filteredUsers,
     menus: (await menusModel.getByDate(date.id)).filter((x) => !!x.id),
     message,
+    isAdmin: userId === 35612,
   });
 });
 
@@ -72,23 +74,28 @@ router.post("/", async (req, res) => {
   if (!req.session.user) return res.redirect("/login");
 
   /* Do it via internal server  */
-  const { statusCode } = await socket.setFood({
+  const response = await socket.setFood({
     date: req.body.date,
     food: req.body.dish,
     user_id: req.body.user,
     department: req.session.user.department,
   });
 
-  req.session.orderCode = statusCode;
+  /* If something wrong with socket */
+  if (!response) {
+    req.session.orderCode = -1;
+  } else {
+    req.session.orderCode = response.statusCode;
 
-  /* Save order to database */
-  if (statusCode === 200) {
-    ordersModel.addOrUpdate({
-      user: +req.body.user,
-      date: req.body.date,
-      dish: req.body.dishName,
-      status: 1,
-    });
+    /* Save order to database */
+    if (response.statusCode === 200) {
+      ordersModel.addOrUpdate({
+        user: +req.body.user,
+        date: req.body.date,
+        dish: req.body.dishName,
+        status: 1,
+      });
+    }
   }
 
   res.redirect("/");
@@ -98,9 +105,7 @@ router.post("/", async (req, res) => {
 router.post("/menu/:userId/:date", async (req, res) => {
   const userId = +req.params.userId;
   const date = req.params.date;
-
   const order = await ordersModel.getByUserAndDate(userId, date);
-
   res.send(order && order.dish);
 });
 

@@ -2,6 +2,7 @@ const datesModel = require("../models/dates");
 const menusModel = require("../models/menus");
 const ordersModel = require("../models/orders");
 const usersModel = require("../models/users");
+const logger = require("../utils/winston");
 const socket = require("../socket");
 
 const defaultDepartment = "LAPTRINH";
@@ -10,9 +11,12 @@ async function getDataAndSave(
   department = defaultDepartment,
   forceUpdate = true
 ) {
-  console.log("[Cron] Getting menu of next date...");
+  logger.info("[Crawl] Getting menu of next date");
 
-  const { statusCode, data } = await socket.getData({ department });
+  const response = await socket.getData({ department });
+  if (!response) return false;
+
+  const { statusCode, data } = response;
   const isSucceed = statusCode === 200;
 
   if (isSucceed) {
@@ -22,7 +26,7 @@ async function getDataAndSave(
     data.users.forEach(async (user) => {
       try {
         if (!allUsers.some((u) => u.id === +user.value)) {
-          console.log(`- Add user ${user.value} ${user.label}`);
+          logger.info(`[Crawl] Add user ${user.value} ${user.label}`);
 
           await usersModel.add({
             id: user.value,
@@ -30,8 +34,7 @@ async function getDataAndSave(
           });
         }
       } catch (err) {
-        console.log("- Error when adding user ⚠");
-        console.log(`- ${err.message}`);
+        logger.error(`[Crawl] Error when adding user ${err.message}`);
       }
     });
 
@@ -49,8 +52,7 @@ async function getDataAndSave(
         name: date.label,
       });
     } catch (err) {
-      console.log("- Error when adding date ⚠");
-      console.log(`- ${err.message}`);
+      logger.error(`[Crawl] Error when adding date ${err.message}`);
     }
 
     /* Add menu to database */
@@ -62,12 +64,11 @@ async function getDataAndSave(
           id: dish.value,
         });
       } catch (err) {
-        console.log("- Error when adding menu ⚠");
-        console.log(`- ${err.message}`);
+        logger.error(`[Crawl] Error when adding menu ${err.message}`);
       }
     });
 
-    console.log(`- Saved data of ${date.label} ✓`);
+    logger.info(`[Crawl] Saved data of ${date.label}`);
   }
 
   return isSucceed;

@@ -1,23 +1,35 @@
+const logger = require("./utils/winston");
 const timeoutPromise = require("./utils/timeoutPromise");
-const ACTIONS = require("./constants/actions");
 
-var socket;
+/* Must be synchronized with internal */
+const SOCKET_ACTION = {
+  I_AM_INTRANET: "iAmIntranet",
+  VALIDATE_COOKIE: "validateCookie",
+  GET_DATA: "getData",
+  SET_FOOD: "setFood",
+  GET_LIST: "getList",
+  GET_LIST_ALL: "getListAll",
+};
+
+let socket;
 
 /**
  * Setup socket.io
  */
 function setupSocket(io) {
-  /* Internal server connected */
   io.on("connect", async (_socket) => {
-    _socket.on(ACTIONS.I_AM_INTRANET, async () => {
-      /* io.socketsLeave(ACTIONS.I_AM_INTRANET); */
-      _socket.join(ACTIONS.I_AM_INTRANET);
+    /* Internal server connected */
+    _socket.on(SOCKET_ACTION.I_AM_INTRANET, async () => {
+      _socket.join(SOCKET_ACTION.I_AM_INTRANET);
       socket = _socket;
 
-      /* Debugging intranet clients */
-      const intranetRooms = io.sockets.adapter.rooms.get(ACTIONS.I_AM_INTRANET);
-      const roomSize = intranetRooms ? intranetRooms.size : 0;
-      console.log(`Intranet clients is ${roomSize} ${roomSize ? "✓" : "⚠"}`);
+      const intranetRooms = io.sockets.adapter.rooms.get(
+        SOCKET_ACTION.I_AM_INTRANET
+      );
+
+      if (intranetRooms && intranetRooms.size > 1) {
+        logger.info(`[Socket] Internal clients is ${intranetRooms.size}`);
+      }
     });
 
     _socket.on("forceDisconnect", () => {
@@ -29,7 +41,7 @@ function setupSocket(io) {
     });
   });
 
-  console.log("Initialize socket.io");
+  logger.info(`[Socket] Initializing`);
 }
 
 /**
@@ -51,7 +63,7 @@ async function validateCookie(payload) {
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
-      socket.emit(ACTIONS.VALIDATE_COOKIE, payload, (answer) => {
+      socket.emit(SOCKET_ACTION.VALIDATE_COOKIE, payload, (answer) => {
         if (!answered) {
           answered = true;
           resolve(answer);
@@ -70,7 +82,7 @@ async function getData(payload) {
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
-      socket.emit(ACTIONS.GET_DATA, payload, (answer) => {
+      socket.emit(SOCKET_ACTION.GET_DATA, payload, (answer) => {
         if (!answered) {
           answered = true;
           resolve(answer);
@@ -89,7 +101,7 @@ async function setFood(payload) {
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
-      socket.emit(ACTIONS.SET_FOOD, payload, (answer) => {
+      socket.emit(SOCKET_ACTION.SET_FOOD, payload, (answer) => {
         if (!answered) {
           answered = true;
           resolve(answer);
@@ -108,7 +120,7 @@ async function getList(payload) {
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
-      socket.emit(ACTIONS.GET_LIST, payload, (answer) => {
+      socket.emit(SOCKET_ACTION.GET_LIST, payload, (answer) => {
         if (!answered) {
           answered = true;
           resolve(answer);
@@ -127,7 +139,7 @@ async function getListAll(payload) {
   return timeoutPromise(
     new Promise((resolve) => {
       let answered = false;
-      socket.emit(ACTIONS.GET_LIST_ALL, payload, (answer) => {
+      socket.emit(SOCKET_ACTION.GET_LIST_ALL, payload, (answer) => {
         if (!answered) {
           answered = true;
           resolve(answer);

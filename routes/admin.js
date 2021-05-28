@@ -3,7 +3,9 @@ const router = express.Router();
 const formidable = require("formidable");
 const XLSX = require("xlsx");
 const dayjs = require("dayjs");
+const logger = require("../utils/winston");
 const compare = require("../utils/compare");
+const { autoOrder } = require("../crons");
 
 const menusModel = require("../models/menus");
 const ordersModel = require("../models/orders");
@@ -20,15 +22,13 @@ router.get("/tqnghi@", async (req, res) => {
  * Upload menu from excel
  */
 router.post("/upload-menu", async (req, res) => {
-  console.log("[Admin] Uploading menu...");
+  logger.info("[Admin] Uploading menu");
 
   const data = [];
   const form = new formidable.IncomingForm();
 
   form.on("error", (err) => {
-    console.log(`- Upload data error ⚠`);
-    console.log(`- ${err.message}`);
-
+    logger.error(`[Admin] Upload data error ${err.message}`);
     res.redirect("/admin/tqnghi@?code=failed");
   });
 
@@ -78,13 +78,10 @@ router.post("/upload-menu", async (req, res) => {
         /* Add menu of the targetDate */
         data.push(record);
       }
-      console.log("- Upload data succeed ✓");
-
+      logger.info("[Admin] Upload menu succeed");
       res.redirect("/admin/tqnghi@?code=success");
     } catch (err) {
-      console.log("- Upload data error ⚠");
-      console.log(`- ${err.message}`);
-
+      logger.error(`[Admin] Upload data error ${err.message}`);
       res.redirect("/admin/tqnghi@?code=failed");
     }
   });
@@ -94,21 +91,28 @@ router.post("/upload-menu", async (req, res) => {
  * Delete menus and orders of last week
  */
 router.post("/purge-data", async (_, res) => {
-  console.log("[Admin] Purging data...");
+  logger.info("[Admin] Purging data");
 
   try {
     await menusModel.deleteOldMenus();
     await ordersModel.deleteOldOrders();
 
-    console.log("- Purging data succeed ✓");
-
+    logger.info("[Admin] Purging data succeed");
     res.redirect("/admin/tqnghi@?code=success");
   } catch (err) {
-    console.log("- Purge data error ⚠");
-    console.log(`- ${err.message}`);
-
+    logger.error(`- Purge data error ${err.message}`);
     res.redirect("/admin/tqnghi@?code=failed");
   }
+});
+
+/**
+ * Manually trigger auto order
+ */
+router.post("/auto-order", async (_, res) => {
+  logger.info("[Admin] Trigger auto order");
+  await ordersModel.debug();
+  await autoOrder();
+  res.redirect("/admin/tqnghi@");
 });
 
 module.exports = router;

@@ -34,7 +34,7 @@ function disableAllElements(disable) {
 /* On submit form */
 function onSubmit() {
   disableAllElements(true);
-  $("#schedule-message").html("<b>Đang đặt lịch...</>");
+  $("#schedule-message").html("<b>Đang đặt lịch</>");
 }
 
 /* Use ajax to get orders list */
@@ -69,7 +69,7 @@ function onChangeUser(e) {
 /* Sync order list from intranet to database */
 function syncOrderOfDate(date) {
   disableAllElements(true);
-  $("#schedule-message").html("<b>Đang đồng bộ hóa...</>");
+  $("#schedule-message").html("<b>Đang đồng bộ hóa</>");
 
   $.post(`/schedule/sync/${date}`, (data) => {
     window.location.reload();

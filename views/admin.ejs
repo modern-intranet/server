@@ -47,8 +47,6 @@
         </div>
       </div>
     </nav>
-    <br />
-    <br />
     <form class="center" action="/admin/purge-data" method="POST">
       <button type="submit" class="btn btn-primary">Làm sạch dữ liệu</button>
     </form>
@@ -57,6 +55,7 @@
       action="/admin/upload-menu"
       method="POST"
       enctype="multipart/form-data"
+      style="margin-top: 24px"
     >
       <input type="file" name="file" />
       <button
@@ -66,6 +65,9 @@
       >
         Gửi danh sách
       </button>
+    </form>
+    <form class="center" action="/admin/auto-order" method="POST">
+      <button type="submit" class="btn btn-primary">Đặt cơm tự động</button>
     </form>
     <script src="/javascripts/admin.js" type="text/javascript"></script>
   </body>

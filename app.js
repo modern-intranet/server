@@ -14,6 +14,9 @@ const blogRouter = require("./routes/blog");
 /* Load environment file */
 require("dotenv").config();
 
+/* Enable logging */
+require("./utils/winston");
+
 const app = express();
 
 /* Passport middleware */

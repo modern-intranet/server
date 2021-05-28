@@ -24,7 +24,7 @@ passport.use(
         if (
           [
             "@seatalk.biz",
-            "@airpay.biz",
+            "@airpay.com",
             "@foody.com",
             "@sea.com",
             "@garena.com",

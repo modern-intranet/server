@@ -33,9 +33,8 @@ router.post("/", async (req, res) => {
 router.post("/of/:date", async (req, res) => {
   if (!req.session.user) return res.redirect("/login");
 
-  const date = req.params.date;
   const response = await socket.getList({
-    date,
+    date: req.params.date,
     department: req.session.user.department,
   });
 

@@ -1,7 +1,10 @@
 const nodemailer = require("nodemailer");
+const logger = require("../utils/winston");
 
 async function sendEmail({ to, title, list }) {
-  if (!to.length) return;
+  if (!to.length) {
+    return logger.info("[Cron] No record");
+  }
 
   try {
     const transporter = nodemailer.createTransport({
@@ -15,22 +18,18 @@ async function sendEmail({ to, title, list }) {
     });
 
     await transporter.sendMail({
-      from: '"Đặt cơm tự động" <tonys_trinh@outlook.com>',
+      from: `"Modern Intranet" <${process.env.EMAIL_USERNAME}>`,
       to: to.join(", "),
       subject: title,
       text: JSON.stringify(list),
-      html: `<h3>${title}</h3>
-            ${list.map(
-              (l) =>
-                `<b>Họ tên</b>: ${l.user}<br /><b>Món</b>: ${l.dish}<br /><br />`
-            )}
+      html: `${list.map(
+        (l) => `<b>Họ tên</b>: ${l.user}<br /><b>Món</b>: ${l.dish}<br /><br />`
+      )}
         `,
     });
-
-    console.log("- Send email successfully ✓");
+    logger.info("[Cron] Send email successfully");
   } catch (err) {
-    console.log("- Send email failed ⚠");
-    console.log(`- ${err.message}`);
+    logger.error(`[Cron] Send email failed ${err.message}`);
   }
 }
 

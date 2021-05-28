@@ -1,5 +1,6 @@
 const cron = require("node-cron");
 const socket = require("./socket");
+const logger = require("./utils/winston");
 
 const datesModel = require("./models/dates");
 const menusModel = require("./models/menus");
@@ -17,28 +18,27 @@ cron.schedule("*/5 13-17 * * Mon-Fri", getDataAndSave, {
   scheduled: true,
   timezone: "Asia/Ho_Chi_Minh",
 });
-setTimeout(getDataAndSave, 3000);
 
 /**
  * Auto order
  * Every 5 minutes between 13:00 and 18:00 on Monday to Friday
  */
 async function autoOrder() {
-  console.log("[Cron] Auto order...");
+  logger.info("[Cron] Auto order as schedules");
 
   /* Get target date */
   const date = await datesModel.getNext();
 
   /* If that (closet future) date is not avaiable yet */
   if (!date) {
-    console.log("- Menu is not ready ⚠");
+    logger.error("[Cron] Menu is not ready");
     return;
   }
 
   /* Get menu of that date */
   const menus = await menusModel.getByDate(date.id);
   if (!menus.length) {
-    console.log("- Menu is empty ⚠");
+    logger.error("[Cron] Menu is empty");
     return;
   }
 
@@ -56,7 +56,7 @@ async function autoOrder() {
     let dish;
     const o = orders[i];
 
-    console.log(`- User ${o.user} order ${o.dish}...`);
+    logger.info(`[Cron] User ${o.user} order ${o.dish}`);
 
     /* If choose randomly */
     if (compare(o.dish, "Random")) {
@@ -68,26 +68,26 @@ async function autoOrder() {
 
     /* If dish not exist (due to wrong text) */
     if (!dish) {
-      console.log(`- Not exist in menu, choosing first option ⚠`);
+      logger.error(`[Cron] Not exist in menu, choosing first option`);
       dish = menus.find((m) => !!m.id);
     }
 
     /* If dish doesn't have id (abnormal case) */
     if (!dish.id) {
-      console.log(`- Exists but no id, choosing first option ⚠`);
+      logger.error(`[Cron] Exists but no id, choosing first option`);
       dish = menus.find((m) => !!m.id);
     }
 
     /* After fallback to first option */
     /* If dish still doesn't have id, skip user */
     if (!dish) {
-      console.log(`- No menu valid, skip this user ⚠`);
+      logger.error(`[Cron] No menu valid, skip this user`);
       return;
     }
 
     const user = allUsers.find((u) => u.id === o.user);
     if (!user) {
-      console.log(`- User is not existed ⚠`);
+      logger.error(`[Cron] User is not existed`);
       return;
     }
 
@@ -99,10 +99,14 @@ async function autoOrder() {
     };
 
     /* Set food through internal server */
-    const { statusCode } = await socket.setFood(payload);
+    const response = await socket.setFood(payload);
 
-    if (statusCode === 200) {
-      console.log(`- Order succeed ✓`);
+    if (!response) {
+      return logger.error(`[Cron] Cannot connect to intranet`);
+    }
+
+    if (response.statusCode === 200) {
+      logger.info(`[Cron] Order succeed`);
 
       /* Update status of order */
       ordersModel.addOrUpdate({
@@ -118,7 +122,7 @@ async function autoOrder() {
         sendEmailData.list.push({ user: user.name, dish: dish.dish });
       }
     } else {
-      console.log(`- Order failed from internal ⚠`);
+      logger.error(`[Cron] Order failed from internal`);
     }
   }
 
@@ -130,3 +134,7 @@ cron.schedule("*/5 13-17 * * Mon-Fri", autoOrder, {
   scheduled: true,
   timezone: "Asia/Ho_Chi_Minh",
 });
+
+module.exports = {
+  autoOrder,
+};
