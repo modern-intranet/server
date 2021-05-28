@@ -27,9 +27,9 @@ function setupSocket(io) {
         SOCKET_ACTION.I_AM_INTRANET
       );
 
-      if (intranetRooms && intranetRooms.size > 1) {
-        logger.info(`[Socket] Internal clients is ${intranetRooms.size}`);
-      }
+      logger.info(
+        `[Socket] Internal clients is ${intranetRooms && intranetRooms.size}`
+      );
     });
 
     _socket.on("forceDisconnect", () => {
