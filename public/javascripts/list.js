@@ -20,6 +20,8 @@ window.onload = () => {
       } else {
         $("#list-table td").html("<b>Không có danh sách</b>");
       }
-    } catch {}
+    } catch {
+      $("#list-table td").html("<b>Đã xảy ra lỗi kết nối</b>");
+    }
   });
 };

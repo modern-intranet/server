@@ -1,20 +1,16 @@
 const timeoutPromise = require("./utils/timeoutPromise");
 const ACTIONS = require("./constants/actions");
-const datesModel = require("./models/dates");
 
-var io;
 var socket;
 
 /**
  * Setup socket.io
  */
-function setupSocket(_io) {
-  io = _io;
-
+function setupSocket(io) {
   /* Internal server connected */
   io.on("connect", async (_socket) => {
     _socket.on(ACTIONS.I_AM_INTRANET, async () => {
-      io.socketsLeave(ACTIONS.I_AM_INTRANET);
+      /* io.socketsLeave(ACTIONS.I_AM_INTRANET); */
       _socket.join(ACTIONS.I_AM_INTRANET);
       socket = _socket;
 
@@ -41,8 +37,6 @@ function setupSocket(_io) {
  */
 function validateSocket() {
   if (!socket || !socket.connected) {
-    console.log("[Socket] Leave all intranet clients");
-    if (io) io.socketsLeave(ACTIONS.I_AM_INTRANET);
     return false;
   }
   return true;

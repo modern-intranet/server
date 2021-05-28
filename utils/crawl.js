@@ -4,7 +4,12 @@ const ordersModel = require("../models/orders");
 const usersModel = require("../models/users");
 const socket = require("../socket");
 
-async function getDataAndSave(department, forceUpdate = true) {
+const defaultDepartment = "LAPTRINH";
+
+async function getDataAndSave(
+  department = defaultDepartment,
+  forceUpdate = true
+) {
   console.log("[Cron] Getting menu of next date...");
 
   const { statusCode, data } = await socket.getData({ department });
