@@ -89,7 +89,7 @@ router.post("/", async (req, res) => {
 
     /* Save order to database */
     if (response.statusCode === 200) {
-      ordersModel.addOrUpdate({
+      await ordersModel.addOrUpdate({
         user: +req.body.user,
         date: req.body.date,
         dish: req.body.dishName,

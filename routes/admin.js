@@ -32,7 +32,7 @@ router.post("/upload-menu", async (req, res) => {
     res.redirect("/admin/tqnghi@?code=failed");
   });
 
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     try {
       if (Object.keys(files).length === 0) throw new Error("No file uploaded");
 
@@ -69,7 +69,7 @@ router.post("/upload-menu", async (req, res) => {
           record.options.push(dish);
 
           /* Save to database */
-          menusModel.addOrUpdate({
+          await menusModel.addOrUpdate({
             date: targetDate,
             dish,
           });

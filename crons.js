@@ -109,7 +109,7 @@ async function autoOrder() {
       logger.info(`[Cron] Order succeed`);
 
       /* Update status of order */
-      ordersModel.addOrUpdate({
+      await ordersModel.addOrUpdate({
         user: +o.user,
         date: date.id,
         dish: dish.dish,
