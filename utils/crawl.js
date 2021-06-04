@@ -7,10 +7,7 @@ const socket = require("../socket");
 
 const defaultDepartment = "LAPTRINH";
 
-async function getDataAndSave(
-  department = defaultDepartment,
-  forceUpdate = true
-) {
+async function getDataAndSave(department = defaultDepartment) {
   logger.info("[Crawl] Getting menu of next date");
 
   const response = await socket.getData({ department });
@@ -20,30 +17,10 @@ async function getDataAndSave(
   const isSucceed = statusCode === 200;
 
   if (isSucceed) {
-    const allUsers = await usersModel.getAll();
-
-    /* Add new user to database */
-    data.users.forEach(async (user) => {
-      try {
-        if (!allUsers.some((u) => u.id === +user.value)) {
-          logger.info(`[Crawl] Add user ${user.value} ${user.label}`);
-
-          await usersModel.add({
-            id: user.value,
-            name: user.label,
-          });
-        }
-      } catch (err) {
-        logger.error(`[Crawl] Error when adding user ${err.message}`);
-      }
-    });
+    const date = data.dates[0];
 
     /* Validate date */
-    const date = data.dates[0];
     if (!date) return false;
-
-    /* Skip if data already exists */
-    if (!(await datesModel.getById(date.value)) && !forceUpdate) return false;
 
     /* Add date to database */
     try {

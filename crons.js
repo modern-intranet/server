@@ -14,7 +14,7 @@ const sendEmail = require("./utils/sendEmail");
  * Get menu of the closet next date
  * Every 5 minutes between 13:00 and 18:00 on Monday to Friday
  */
-cron.schedule("*/5 13-17 * * Mon-Fri", getDataAndSave, {
+cron.schedule("*/5 13-17 * * Mon-Fri", () => getDataAndSave(), {
   scheduled: true,
   timezone: "Asia/Ho_Chi_Minh",
 });

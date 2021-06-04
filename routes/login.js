@@ -4,6 +4,7 @@ const passport = require("passport");
 const socket = require("../socket");
 
 const usersModel = require("../models/users");
+const logger = require("../utils/winston");
 
 /**
  * Main view route
@@ -64,22 +65,40 @@ router.get(
   async (req, res) => {
     try {
       const email = req.session.passport.user.email;
-      const user = await usersModel.getByEmail(email);
+      const userInDatabase = await usersModel.getByEmail(email);
 
       /* User already exists in database */
-      if (user) {
-        req.session.user = user;
+      if (userInDatabase) {
+        req.session.user = userInDatabase;
 
         /* Check cookie of user department */
         await socket.validateCookie({
-          department: user.department,
+          department: userInDatabase.department,
         });
 
         return res.redirect("/");
       }
 
-      /* User not exists in database */
-      res.redirect("/login/choose");
+      /* User not exists in database, get from intranet */
+      const response = await socket.getUserInfo({ email });
+
+      /* If cannot connect to internal server */
+      if (!response || !response.data || response.statusCode !== 200) {
+        return res.redirect("/login/failed#internal-server");
+      }
+
+      req.session.user = response.data;
+
+      /* Add new user to database */
+      await usersModel.add({
+        id: response.data.id,
+        name: response.data.name,
+        department: response.data.department,
+        email,
+      });
+      logger.info(`[Database] Add user ${email}`);
+
+      return res.redirect("/");
     } catch {
       res.redirect("/login/failed#database");
     }

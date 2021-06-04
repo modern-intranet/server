@@ -9,6 +9,7 @@ const SOCKET_ACTION = {
   SET_FOOD: "setFood",
   GET_LIST: "getList",
   GET_LIST_ALL: "getListAll",
+  GET_USER_INFO: "getUserInfo",
 };
 
 let socket;
@@ -149,6 +150,25 @@ async function getListAll(payload) {
   );
 }
 
+/**
+ * Get user info by email
+ */
+async function getUserInfo(payload) {
+  if (!validateSocket()) return false;
+
+  return timeoutPromise(
+    new Promise((resolve) => {
+      let answered = false;
+      socket.emit(SOCKET_ACTION.GET_USER_INFO, payload, (answer) => {
+        if (!answered) {
+          answered = true;
+          resolve(answer);
+        }
+      });
+    })
+  );
+}
+
 module.exports = {
   setupSocket,
   validateCookie,
@@ -156,4 +176,5 @@ module.exports = {
   setFood,
   getList,
   getListAll,
+  getUserInfo,
 };
