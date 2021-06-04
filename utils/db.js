@@ -22,7 +22,7 @@ module.exports = {
       const connection = createConnection();
       connection.connect((err) => {
         if (err) {
-          reject("Cannot connect database");
+          reject(`[Database] Loading ${sql}`);
         } else {
           connection.query(sql, (error, results) => {
             if (error) reject(error);
@@ -41,7 +41,7 @@ module.exports = {
       const connection = createConnection();
       connection.connect((err) => {
         if (err) {
-          reject("Cannot connect database");
+          reject(`[Database] Adding ${tablename}`);
         } else {
           connection.query(sql, entity, (error, value) => {
             if (error) reject(error);
